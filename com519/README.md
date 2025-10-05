@@ -1,0 +1,1 @@
+poetry run pyinstaller --onefile src/com519/main.py
