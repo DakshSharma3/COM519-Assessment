@@ -10,6 +10,7 @@ def main():
     label = tk.Label(root, text="Hello, Tkinter!", font=("Arial", 16))
     label.pack(pady=50)
 
+
     root.mainloop()
 
 if __name__ == "__main__":
