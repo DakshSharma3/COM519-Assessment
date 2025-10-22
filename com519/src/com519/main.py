@@ -1,12 +1,15 @@
 # tkinter_app/main.py
 
 import tkinter as tk
+from tkinter import messagebox
 from functools import partial
 
 
 def login(username,password):
-    print(username.get())
-    print(password.get())
+    username = username.get()
+    password = password.get()
+    messagebox.showinfo("Information", f"Usernmae is {username} and password is {password}")
+
 
 def main():
     root = tk.Tk()
