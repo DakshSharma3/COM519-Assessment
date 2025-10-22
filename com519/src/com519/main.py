@@ -1,14 +1,41 @@
 # tkinter_app/main.py
 
 import tkinter as tk
+from functools import partial
+
+
+def login(username,password):
+    print(username.get())
+    print(password.get())
 
 def main():
     root = tk.Tk()
     root.title("My Tkinter App")
-    root.geometry("300x200")
+    root.geometry("400x150")
+    username = tk.StringVar()
+    password = tk.StringVar()
 
-    label = tk.Label(root, text="Hello, Tkinter!", font=("Arial", 16))
-    label.pack(pady=50)
+
+    usernameText = tk.Label(root, text="Username: ", font=("Arial", 16))
+    usernameText.grid(column=0, row=0, padx=10, pady=10)
+
+    usernameEntry = tk.Entry(root, textvariable=username)
+    usernameEntry.grid(column=1, row=0, padx=10, pady=10)
+
+
+    passwordText = tk.Label(root, text="Password: ", font=("Arial", 16))
+    passwordText.grid(column=0, row=1, padx=10, pady=10)
+
+
+
+    passwordEntry = tk.Entry(root, textvariable=password, show="*")
+    passwordEntry.grid(column=1, row=1, padx=10, pady=10)
+
+    loginButton = tk.Button(root, text="Login", command= partial(login, usernameEntry, passwordEntry))
+    loginButton.grid(column=1, row=2, padx=10, pady=10)
+
+
+
 
     root.mainloop()
 
