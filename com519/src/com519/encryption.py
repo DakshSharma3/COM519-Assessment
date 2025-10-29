@@ -3,7 +3,7 @@ from cryptography.fernet import Fernet
 # 1️⃣ Generate a key (do this once and store it safely)
 key = Fernet.generate_key()
 print("Encryption Key:", key.decode())
-
+print(key)
 # 2️⃣ Create a Fernet instance
 cipher = Fernet(key)
 

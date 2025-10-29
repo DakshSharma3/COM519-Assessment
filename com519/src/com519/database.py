@@ -8,6 +8,6 @@ class Database:
     def disconnect(self):
         self.connection.close()
 
-    def execute_query(self, query):
+    def execute_create_query(self, query):
         # Code to execute a database query
-        pass
+        self.cursor.execute(query)

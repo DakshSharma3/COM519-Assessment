@@ -72,7 +72,7 @@ class Main(tk.Tk):
         branch_text = tk.Label(self, text="Branch: ", font=("Arial", 16))
         branch_text.grid(column=0, row=8, padx=10, pady=10)
 
-        branch_dropdown = ttk.Combobox(self, values=branches, textvariable=branch)
+        branch_dropdown = ttk.Combobox(self, values=branches, textvariable=branch, state="readonly")
         branch_dropdown.grid(column=1, row=8, padx=10, pady=10)
 
 
