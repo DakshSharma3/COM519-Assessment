@@ -62,52 +62,6 @@ class Main(tk.Tk):
         db.connection.commit()
         db.disconnect()
 
-    def valid_username(self, username, db):
-        query = """SELECT * FROM Login WHERE Username = ?;
-        """
-        results = db.cursor.execute(query, (username,)).fetchall()
-        print(len(results))
-        if len(results) <= 0:
-            return True
-        else:
-            return False
-
-    def valid_password(self, password, db):
-        valid_length = len(password) >= 8
-        has_digit = any(character.isdigit() for character in password)
-        has_uppercase = any(character.isupper() for character in password)
-        has_symbol = any(character.isalnum() for character in password)
-
-        if valid_length and has_digit and has_uppercase and has_symbol:
-            return True
-        else:
-            return False
-
-
-
-    def register(self, username, password):
-        username = username.get()
-        password = password.get()
-        db = Database("login.db")
-        if self.valid_username(username, db):
-            if self.valid_password(password, db):
-                key = Fernet.generate_key()
-                cipher = Fernet(key)
-                password = cipher.encrypt(password.encode())
-                query = """
-                INSERT INTO Login (Username, Password, key) VALUES (?, ?, ?);
-                """
-                db.cursor.execute(query, (username, password, key))
-                db.connection.commit()
-                messagebox.showinfo("Information", "Registration Successful")
-                db.disconnect()
-            else:
-                messagebox.showerror("Error", "Registration Failed, password does not meet requirements\n\n- 8 or more characters\n- Contains a capital letter\n- Contains a number\n- Contains a special character")
-                db.disconnect()
-        else:
-            messagebox.showerror("Error", "Registration Failed, username may already exist")
-            db.disconnect()
-
     def open_window(self, username, password):
         window = Register(self, username, password)
         window.grab_set()
