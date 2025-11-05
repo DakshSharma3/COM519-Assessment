@@ -105,16 +105,17 @@ class Main(tk.Tk):
         else:
             return False
 
-    def register_people(self,phone_number, email, address, postcode, branch):
-        if self.valid_number(phone_number) and self.valid_email(email):
-            db = Database("login.db")
-            if not self.address_exists():
-                self.create_address_entry(address, postcode, db)
-                branch_id = self.get_branch_id(branch, db)
+    def valid_number(self, number):
+        valid_digit = number.get().isdigit() and len(number.get()) == 11
+        return valid_digit
+
+    def valid_email(self, email):
+        valid_email = any(character == "@" for character in email.get())
+        return valid_email
 
     def get_branch_id(self, branch, db):
         query = """SELECT Branch ID FROM Branch WHERE Branch = ?;"""
-        results = db.cursor.execute(query, (branch,)).fetchone()
+        results = db.cursor.execute(query, (branch.get(),)).fetchone()
         return results[0]
 
     def get_address_id(self, postcode, db):
@@ -137,13 +138,18 @@ class Main(tk.Tk):
         db.cursor.execute(query, (address.get(), postcode.get()))
         db.connection.commit()
 
-    def valid_number(self, number):
-        valid_digit = number.get().isdigit() and len(number.get()) == 11
-        return valid_digit
 
-    def valid_email(self, email):
-        valid_email = any(character == "@" for character in email.get())
-        return valid_email
+    def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
+        if self.valid_number(phone_number) and self.valid_email(email):
+            db = Database("login.db")
+            if not self.address_exists():
+                self.create_address_entry(address, postcode, db)
+            branch_id = self.get_branch_id(branch, db)
+            address_id = self.get_address_id(postcode, db)
+            query = """INSERT INTO People (First Name, Surename, Address ID, Phone Number, Email, Branch ID) VALUES (?, ?, ?, ?, ?, ?)"""
+            db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id))
+            db.connection.commit()
+            return True
 
     def register(self, username, password):
         username = username.get()
