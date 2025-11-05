@@ -1,6 +1,5 @@
 import tkinter as tk
 from functools import partial
-from operator import truediv
 from tkinter import ttk, messagebox
 
 from cryptography.fernet import Fernet
@@ -8,13 +7,13 @@ from cryptography.fernet import Fernet
 from database import Database
 
 
-class Main(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class Register(tk.Toplevel):
+    def __init__(self, parent, username_entry, password_entry):
+        super().__init__(parent)
         self.title("My Tkinter App")
         self.geometry("400x500")
-        username = tk.StringVar()
-        password = tk.StringVar()
+        self.username = username_entry.get()
+        self.password = password_entry.get()
         forename = tk.StringVar()
         surname = tk.StringVar()
         address = tk.StringVar()
@@ -28,14 +27,18 @@ class Main(tk.Tk):
         username_text = tk.Label(self, text="Username: ", font=("Arial", 16))
         username_text.grid(column=0, row=0, padx=10, pady=10)
 
-        username_entry = tk.Entry(self, textvariable=username)
+        username_entry = tk.Entry(self, textvariable=self.username)
         username_entry.grid(column=1, row=0, padx=10, pady=10)
+        username_entry.delete(0, tk.END)
+        username_entry.insert(0, self.username)
 
         password_text = tk.Label(self, text="Password: ", font=("Arial", 16))
         password_text.grid(column=0, row=1, padx=10, pady=10)
 
-        password_entry = tk.Entry(self, textvariable=password, show="*")
+        password_entry = tk.Entry(self, textvariable=self.password, show="*")
         password_entry.grid(column=1, row=1, padx=10, pady=10)
+        password_entry.delete(0, tk.END)
+        password_entry.insert(0, self.password)
 
         forename_text = tk.Label(self, text="First Name: ", font=("Arial", 16))
         forename_text.grid(column=0, row=2, padx=10, pady=10)
@@ -81,9 +84,19 @@ class Main(tk.Tk):
         branch_dropdown = ttk.Combobox(self, values=branches, textvariable=branch, state="readonly")
         branch_dropdown.grid(column=1, row=8, padx=10, pady=10)
 
-        register_button = tk.Button(self, text="Register", command=partial(self.valid_email, email_entry) )
-        register_button.grid(column=1, row=9, padx=10, pady=10)  # partial(self.register, username_entry, password_entry)
+        register_button = tk.Button(self, text="Register", command=partial(self.register, username_entry, password_entry, forename_entry, surname_entry, phone_number_entry, email_entry, address_entry, postcode_entry, branch) )
+        register_button.grid(column=1, row=9, padx=10, pady=10)
 
+    def display(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
+        print(username.get())
+        print(password.get())
+        print(first_name.get())
+        print(surname.get())
+        print(phone_number.get())
+        print(email.get())
+        print(address.get())
+        print(postcode.get())
+        print(branch.get())
 
     def valid_username(self, username, db):
         query = """SELECT * FROM Login WHERE Username = ?;"""
@@ -114,18 +127,18 @@ class Main(tk.Tk):
         return valid_email
 
     def get_branch_id(self, branch, db):
-        query = """SELECT Branch ID FROM Branch WHERE Branch = ?;"""
+        query = """SELECT Branch ID FROM Branch WHERE Branch Name = ?;"""
         results = db.cursor.execute(query, (branch.get(),)).fetchone()
         return results[0]
 
     def get_address_id(self, postcode, db):
-        postcode = postcode.get().trim().upper()
+        postcode = postcode.get().upper().replace(" ", "")
         query = """SELECT Address ID FROM Address WHERE Postcode = ?;"""
         results = db.cursor.execute(query, (postcode,)).fetchone()
         return results[0]
 
     def address_exists(self, postcode, db):
-        postcode = postcode.get().trim().upper()
+        postcode = postcode.get().upper().replace(" ", "")
         query = """SELECT * FROM Address WHERE Postcode = ?;"""
         results = db.cursor.execute(query, (postcode,)).fetchall()
         if len(results) > 0:
@@ -142,7 +155,7 @@ class Main(tk.Tk):
     def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
         if self.valid_number(phone_number) and self.valid_email(email):
             db = Database("COM519.db")
-            if not self.address_exists():
+            if not self.address_exists(postcode, db):
                 self.create_address_entry(address, postcode, db)
             branch_id = self.get_branch_id(branch, db)
             address_id = self.get_address_id(postcode, db)
@@ -184,5 +197,3 @@ class Main(tk.Tk):
             db.disconnect()
 
 
-main = Main()
-main.mainloop()
