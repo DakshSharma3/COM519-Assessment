@@ -45,7 +45,7 @@ class Main(tk.Tk):
     def login(self,username,password):
         username = username.get()
         password = password.get()
-        db = Database("login.db")
+        db = Database("COM519.db")
         query ="""
         SELECT * FROM Login WHERE Username = ?;
         """

@@ -141,7 +141,7 @@ class Main(tk.Tk):
 
     def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
         if self.valid_number(phone_number) and self.valid_email(email):
-            db = Database("login.db")
+            db = Database("COM519.db")
             if not self.address_exists():
                 self.create_address_entry(address, postcode, db)
             branch_id = self.get_branch_id(branch, db)
@@ -151,19 +151,28 @@ class Main(tk.Tk):
             db.connection.commit()
             return True
 
-    def register(self, username, password):
+    def get_people_id(self, first_name, surname, phone_number, email, address, postcode, branch, db):
+        branch_id = self.get_branch_id(branch, db)
+        address_id = self.get_address_id(postcode, db)
+        query = """SELECT People ID FROM People WHERE First Name = ?, Surname = ?, Address ID = ?, Phone Number = ?, Email = ?, Branch ID = ?;"""
+        results = db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id)).fetchone()
+        return results[0]
+
+    def register(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
         username = username.get()
         password = password.get()
-        db = Database("login.db")
+        db = Database("COM519.db")
         if self.valid_username(username, db):
             if self.valid_password(password, db):
                 key = Fernet.generate_key()
                 cipher = Fernet(key)
                 password = cipher.encrypt(password.encode())
+                self.register_people(first_name, surname, phone_number, email, address, postcode, branch)
                 query = """
-                INSERT INTO Login (Username, Password, key) VALUES (?, ?, ?);
+                INSERT INTO Login (Username, Password, key, People ID) VALUES (?, ?, ?, ?);
                 """
-                db.cursor.execute(query, (username, password, key))
+                people_id = self.get_people_id(first_name, surname, phone_number, email, address, postcode, branch, db)
+                db.cursor.execute(query, (username, password, key, people_id))
                 db.connection.commit()
                 messagebox.showinfo("Information", "Registration Successful")
                 db.disconnect()
