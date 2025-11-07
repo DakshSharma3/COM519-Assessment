@@ -22,6 +22,7 @@ class Register(tk.Toplevel):
         phone_number = tk.StringVar()
         email = tk.StringVar()
         branch = tk.StringVar()
+        self.db = Database(self.database_name)
 
 
 
@@ -82,7 +83,7 @@ class Register(tk.Toplevel):
         branch_text = tk.Label(self, text="Branch: ", font=("Arial", 16))
         branch_text.grid(column=0, row=8, padx=10, pady=10)
 
-        branch_dropdown = ttk.Combobox(self, values=self.get_branch_names(Database(self.database_name)), textvariable=branch, state="readonly")
+        branch_dropdown = ttk.Combobox(self, values=self.db.get_branch_names(), textvariable=branch, state="readonly")
         branch_dropdown.grid(column=1, row=8, padx=10, pady=10)
 
         register_button = tk.Button(self, text="Register", command=partial(self.register, username_entry, password_entry, forename_entry, surname_entry, phone_number_entry, email_entry, address_entry, postcode_entry, branch) )
@@ -99,16 +100,7 @@ class Register(tk.Toplevel):
         print(postcode.get())
         print(branch.get())
 
-#in db
-    def valid_username(self, username, db):
-        query = """SELECT * FROM Login WHERE Username = ?;"""
-        results = db.cursor.execute(query, (username,)).fetchall()
-        if len(results) <= 0:
-            return True
-        else:
-            return False
-
-    def valid_password(self, password, db):
+    def valid_password(self, password):
         valid_length = len(password) >= 8
         has_digit = any(character.isdigit() for character in password)
         has_uppercase = any(character.isupper() for character in password)
@@ -127,86 +119,25 @@ class Register(tk.Toplevel):
         valid_email = any(character == "@" for character in email.get())
         return valid_email
 
-#in db
-    def get_branch_id(self, branch, db):
-        query = """SELECT [Branch ID] FROM Branch WHERE [Branch Name] = ?;"""
-        results = db.cursor.execute(query, (branch.get(),)).fetchone()
-        return results[0]
-#in db
-    def get_address_id(self, postcode, db):
-        postcode = postcode.get().upper().replace(" ", "")
-        query = """SELECT [Address ID] FROM Address WHERE Postcode = ?;"""
-        results = db.cursor.execute(query, (postcode,)).fetchone()
-        return results[0]
-#in db
-    def address_exists(self, postcode, db):
-        postcode = postcode.get().upper().replace(" ", "")
-        query = """SELECT * FROM Address WHERE Postcode = ?;"""
-        results = db.cursor.execute(query, (postcode,)).fetchone()
-        if results is None:
-            return False
-        else:
-            return True
-
-#in db
-    def create_address_entry(self, address, postcode, db):
-        postcode = postcode.get().upper().replace(" ", "")
-        query = """INSERT INTO Address (Address, Postcode) VALUES (?, ?);"""
-        db.cursor.execute(query, (address.get(), postcode))
-        db.connection.commit()
-
-#in db
-    def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
-        if self.valid_number(phone_number) and self.valid_email(email):
-            db = Database(self.database_name)
-            if not self.address_exists(postcode, db):
-                self.create_address_entry(address, postcode, db)
-            branch_id = self.get_branch_id(branch, db)
-            address_id = self.get_address_id(postcode, db)
-            query = """INSERT INTO People (Forename, Surname, [Address ID], [Phone Number], Email, [Branch ID]) VALUES (?, ?, ?, ?, ?, ?)"""
-            db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id))
-            db.connection.commit()
-            db.disconnect()
-            return True
-#in db
-    def get_people_id(self, first_name, surname, phone_number, email, address, postcode, branch, db):
-        branch_id = self.get_branch_id(branch, db)
-        address_id = self.get_address_id(postcode, db)
-        query = """
-        SELECT [People ID] FROM People 
-        WHERE Forename = ? AND Surname = ? AND [Address ID] = ? 
-        AND [Phone Number] = ? AND Email = ? AND [Branch ID] = ?;
-        """
-        results = db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id)).fetchone()
-        return results[0]
-
-#in db
-    def get_branch_names(self, db):
-        query = """SELECT Branch_Name FROM Branch;"""
-        results = db.cursor.execute(query).fetchall()
-        db.disconnect()
-        return results
-
     def register(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
         username = username.get()
         password = password.get()
-        db = Database(self.database_name)
-        if db.username_avaliable(username, db):
-            if self.valid_password(password, db):
+        if self.db.username_available(username):
+            if self.valid_password(password):
                 key = Fernet.generate_key()
                 cipher = Fernet(key)
                 password = cipher.encrypt(password.encode())
                 if self.valid_number(phone_number) and self.valid_email(email):
-                    db.register_people(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
-                people_id = db.get_people_id(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
-                db.create_login_entry(username, password, key, people_id)
+                    self.db.register_people(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
+                people_id = self.db.get_people_id(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
+                self.db.create_login_entry(username, password, key, people_id)
                 messagebox.showinfo("Information", "Registration Successful")
-                db.disconnect()
+                self.db.disconnect()
             else:
                 messagebox.showerror("Error", "Registration Failed, password does not meet requirements\n\n- 8 or more characters\n- Contains a capital letter\n- Contains a number\n- Contains a special character")
-                db.disconnect()
+                self.db.disconnect()
         else:
             messagebox.showerror("Error", "Registration Failed, username may already exist")
-            db.disconnect()
+            self.db.disconnect()
 
 
