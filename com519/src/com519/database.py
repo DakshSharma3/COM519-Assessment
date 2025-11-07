@@ -5,7 +5,6 @@ class Database:
         self.connection = sqlite3.connect(db_string)
         self.cursor = self.connection.cursor()
             
-
     def disconnect(self):
         self.connection.close()
 
@@ -39,8 +38,15 @@ class Database:
 
 
     def execute_create_query(self, query):
-        # Code to execute a database query
         self.cursor.execute(query)
+
+    def create_login_entry(self, username, password, encryption_key, people_id):
+        query = """
+        INSERT INTO Login (Username, Password, Encryption_Key, People_ID) VALUES (?, ?, ?, ?);
+        """
+        self.cursor.execute(query, (username, password, encryption_key, people_id))
+
+        self.connection.commit()
 
     def adding_branch(self, branch_name):
         query = """INSERT INTO Branch (Branch_Name) VALUES (?);"""
@@ -48,7 +54,7 @@ class Database:
         self.connection.commit()
 
     def adding_role(self, role_name):
-        query = """INSERT INTO Role (Role_Name) VALUES (?);"""
+        query = """INSERT INTO Roles (Role_Name) VALUES (?);"""
         self.cursor.execute(query, (role_name,))
         self.connection.commit()
 

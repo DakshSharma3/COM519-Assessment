@@ -182,7 +182,7 @@ class Register(tk.Toplevel):
 
 #in db
     def get_branch_names(self, db):
-        query = """SELECT [Branch Name] FROM Branch;"""
+        query = """SELECT Branch_Name FROM Branch;"""
         results = db.cursor.execute(query).fetchall()
         db.disconnect()
         return results
@@ -196,13 +196,10 @@ class Register(tk.Toplevel):
                 key = Fernet.generate_key()
                 cipher = Fernet(key)
                 password = cipher.encrypt(password.encode())
-                self.register_people(first_name, surname, phone_number, email, address, postcode, branch)
-                query = """
-                INSERT INTO Login (Username, Password, Encryption_Key, People_ID) VALUES (?, ?, ?, ?);
-                """
-                people_id = self.get_people_id(first_name, surname, phone_number, email, address, postcode, branch, db)
-                db.cursor.execute(query, (username, password, key, people_id))
-                db.connection.commit()
+                if self.valid_number(phone_number) and self.valid_email(email):
+                    db.register_people(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
+                people_id = db.get_people_id(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
+                db.create_login_entry(username, password, key, people_id)
                 messagebox.showinfo("Information", "Registration Successful")
                 db.disconnect()
             else:
