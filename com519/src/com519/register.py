@@ -81,7 +81,7 @@ class Register(tk.Toplevel):
         branch_text = tk.Label(self, text="Branch: ", font=("Arial", 16))
         branch_text.grid(column=0, row=8, padx=10, pady=10)
 
-        branch_dropdown = ttk.Combobox(self, values=branches, textvariable=branch, state="readonly")
+        branch_dropdown = ttk.Combobox(self, values=self.get_branch_names(Database("COM519.db")), textvariable=branch, state="readonly")
         branch_dropdown.grid(column=1, row=8, padx=10, pady=10)
 
         register_button = tk.Button(self, text="Register", command=partial(self.register, username_entry, password_entry, forename_entry, surname_entry, phone_number_entry, email_entry, address_entry, postcode_entry, branch) )
@@ -101,7 +101,6 @@ class Register(tk.Toplevel):
     def valid_username(self, username, db):
         query = """SELECT * FROM Login WHERE Username = ?;"""
         results = db.cursor.execute(query, (username,)).fetchall()
-        print(len(results))
         if len(results) <= 0:
             return True
         else:
@@ -111,7 +110,7 @@ class Register(tk.Toplevel):
         valid_length = len(password) >= 8
         has_digit = any(character.isdigit() for character in password)
         has_uppercase = any(character.isupper() for character in password)
-        has_symbol = any(character.isalnum() for character in password)
+        has_symbol = any(not character.isalnum() for character in password)
 
         if valid_length and has_digit and has_uppercase and has_symbol:
             return True
@@ -127,28 +126,29 @@ class Register(tk.Toplevel):
         return valid_email
 
     def get_branch_id(self, branch, db):
-        query = """SELECT Branch ID FROM Branch WHERE Branch Name = ?;"""
+        query = """SELECT [Branch ID] FROM Branch WHERE [Branch Name] = ?;"""
         results = db.cursor.execute(query, (branch.get(),)).fetchone()
         return results[0]
 
     def get_address_id(self, postcode, db):
         postcode = postcode.get().upper().replace(" ", "")
-        query = """SELECT Address ID FROM Address WHERE Postcode = ?;"""
+        query = """SELECT [Address ID] FROM Address WHERE Postcode = ?;"""
         results = db.cursor.execute(query, (postcode,)).fetchone()
         return results[0]
 
     def address_exists(self, postcode, db):
         postcode = postcode.get().upper().replace(" ", "")
         query = """SELECT * FROM Address WHERE Postcode = ?;"""
-        results = db.cursor.execute(query, (postcode,)).fetchall()
-        if len(results) > 0:
-            return True
-        else:
+        results = db.cursor.execute(query, (postcode,)).fetchone()
+        if results is None:
             return False
+        else:
+            return True
 
     def create_address_entry(self, address, postcode, db):
+        postcode = postcode.get().upper().replace(" ", "")
         query = """INSERT INTO Address (Address, Postcode) VALUES (?, ?);"""
-        db.cursor.execute(query, (address.get(), postcode.get()))
+        db.cursor.execute(query, (address.get(), postcode))
         db.connection.commit()
 
 
@@ -159,17 +159,28 @@ class Register(tk.Toplevel):
                 self.create_address_entry(address, postcode, db)
             branch_id = self.get_branch_id(branch, db)
             address_id = self.get_address_id(postcode, db)
-            query = """INSERT INTO People (First Name, Surename, Address ID, Phone Number, Email, Branch ID) VALUES (?, ?, ?, ?, ?, ?)"""
+            query = """INSERT INTO People (Forename, Surname, [Address ID], [Phone Number], Email, [Branch ID]) VALUES (?, ?, ?, ?, ?, ?)"""
             db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id))
             db.connection.commit()
+            db.disconnect()
             return True
 
     def get_people_id(self, first_name, surname, phone_number, email, address, postcode, branch, db):
         branch_id = self.get_branch_id(branch, db)
         address_id = self.get_address_id(postcode, db)
-        query = """SELECT People ID FROM People WHERE First Name = ?, Surname = ?, Address ID = ?, Phone Number = ?, Email = ?, Branch ID = ?;"""
+        query = """
+        SELECT [People ID] FROM People 
+        WHERE Forename = ? AND Surname = ? AND [Address ID] = ? 
+        AND [Phone Number] = ? AND Email = ? AND [Branch ID] = ?;
+        """
         results = db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id)).fetchone()
         return results[0]
+
+    def get_branch_names(self, db):
+        query = """SELECT [Branch Name] FROM Branch;"""
+        results = db.cursor.execute(query).fetchall()
+        db.disconnect()
+        return results
 
     def register(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
         username = username.get()
@@ -182,7 +193,7 @@ class Register(tk.Toplevel):
                 password = cipher.encrypt(password.encode())
                 self.register_people(first_name, surname, phone_number, email, address, postcode, branch)
                 query = """
-                INSERT INTO Login (Username, Password, key, People ID) VALUES (?, ?, ?, ?);
+                INSERT INTO Login (Username, Password, key, [People ID]) VALUES (?, ?, ?, ?);
                 """
                 people_id = self.get_people_id(first_name, surname, phone_number, email, address, postcode, branch, db)
                 db.cursor.execute(query, (username, password, key, people_id))

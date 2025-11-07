@@ -6,7 +6,7 @@ from functools import partial
 from tkinter import ttk
 from cryptography.fernet import Fernet
 
-from com519.register import Register
+from register import Register
 from database import Database
 import os
 
@@ -60,7 +60,6 @@ class Main(tk.Tk):
         else:
             messagebox.showerror("Error", "Login Failed, no such user")
 
-        db.connection.commit()
         db.disconnect()
 
     def open_window(self, username, password):
