@@ -40,10 +40,12 @@ class Main(tk.Tk):
         register_button = tk.Button(self, text="Register", command= partial(self.open_window, username_entry, password_entry))
         register_button.grid(column=2, row=2, padx=10, pady=10)
 
-    # def create_database(self):
-    #     if os.path.exists("COM534.db"):
-    #         db = Database("COM534.db")
-    #         queries = ["CREATE TABLE People ([People ID] INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Forename TEXT, Surname TEXT, [Address ID] INTEGER REFERENCES Address ([Address ID]), [Phone Number] INTEGER, Email TEXT, [Branch ID] INTEGER REFERENCES Branch ([Branch ID]));"]
+    def create_database(self):
+        if not os.path.exists(self.databaseName):
+            db = Database(self.databaseName)
+            db.create_tables()
+            db.disconnect()
+
     def login(self,username,password):
         username = username.get()
         password = password.get()

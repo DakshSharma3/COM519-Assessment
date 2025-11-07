@@ -198,7 +198,7 @@ class Register(tk.Toplevel):
                 password = cipher.encrypt(password.encode())
                 self.register_people(first_name, surname, phone_number, email, address, postcode, branch)
                 query = """
-                INSERT INTO Login (Username, Password, key, [People ID]) VALUES (?, ?, ?, ?);
+                INSERT INTO Login (Username, Password, Encryption_Key, People_ID) VALUES (?, ?, ?, ?);
                 """
                 people_id = self.get_people_id(first_name, surname, phone_number, email, address, postcode, branch, db)
                 db.cursor.execute(query, (username, password, key, people_id))
