@@ -191,7 +191,7 @@ class Register(tk.Toplevel):
         username = username.get()
         password = password.get()
         db = Database(self.database_name)
-        if self.valid_username(username, db):
+        if db.username_avaliable(username, db):
             if self.valid_password(password, db):
                 key = Fernet.generate_key()
                 cipher = Fernet(key)

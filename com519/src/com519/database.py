@@ -4,22 +4,24 @@ class Database:
     def __init__(self, db_string):
         self.connection = sqlite3.connect(db_string)
         self.cursor = self.connection.cursor()
+        self.cursor.execute("PRAGMA foreign_keys = ON;")
             
     def disconnect(self):
+        self.connection.commit()
         self.connection.close()
 
     def create_tables(self):
         table_queries = [
-            'CREATE TABLE Branch ("Branch_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Branch_Name" TEXT);',
-            'CREATE TABLE Roles ("Role_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Role_Name" TEXT);',
-            'CREATE TABLE Address ("Address_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Address" TEXT, "Postcode" TEXT);',
-            'CREATE TABLE People ("People_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Forename" TEXT, "Surname" TEXT, "Address_ID" INTEGER REFERENCES Address("Address_ID"), "Phone_Number" INTEGER, "Email" TEXT, "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"));',
-            'CREATE TABLE Employees ("Employee_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Role_ID" INTEGER REFERENCES Roles("Role_ID"), "Employee_Email" TEXT);',
-            'CREATE TABLE Login ("User_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Username" TEXT, "Password" TEXT, "Encryption_Key" TEXT, "People_ID" INTEGER REFERENCES People("People_ID"), "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"));',
-            'CREATE TABLE Accounts ("Account_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Account_Type" TEXT, "Balance" REAL DEFAULT (0.0));',
-            'CREATE TABLE Appointments ("Appointment_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"), "People_ID" INTEGER REFERENCES People("People_ID"), "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"), "Date" TEXT, "Time" INTEGER, "Purpose" TEXT);'
+            'CREATE TABLE IF NOT EXISTS Branch ("Branch_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Branch_Name" TEXT);',
+            'CREATE TABLE IF NOT EXISTS Roles ("Role_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Role_Name" TEXT);',
+            'CREATE TABLE IF NOT EXISTS Address ("Address_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Address" TEXT, "Postcode" TEXT);',
+            'CREATE TABLE IF NOT EXISTS People ("People_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Forename" TEXT, "Surname" TEXT, "Address_ID" INTEGER REFERENCES Address("Address_ID"), "Phone_Number" INTEGER, "Email" TEXT, "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"));',
+            'CREATE TABLE IF NOT EXISTS Employees ("Employee_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Role_ID" INTEGER REFERENCES Roles("Role_ID"), "Employee_Email" TEXT);',
+            'CREATE TABLE IF NOT EXISTS Login ("User_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Username" TEXT, "Password" TEXT, "Encryption_Key" TEXT, "People_ID" INTEGER REFERENCES People("People_ID"), "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"));',
+            'CREATE TABLE IF NOT EXISTS Accounts ("Account_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Account_Type" TEXT, "Balance" REAL DEFAULT (0.0));',
+            'CREATE TABLE IF NOT EXISTS Appointments ("Appointment_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"), "People_ID" INTEGER REFERENCES People("People_ID"), "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"), "Date" TEXT, "Time" INTEGER, "Purpose" TEXT);'
         ]
-
+    
         for query in table_queries:
             self.execute_create_query(query)
 
@@ -40,6 +42,9 @@ class Database:
     def execute_create_query(self, query):
         self.cursor.execute(query)
 
+    def format_postcode(self, postcode):
+        return postcode.upper().replace(" ", "")
+
     def create_login_entry(self, username, password, encryption_key, people_id):
         query = """
         INSERT INTO Login (Username, Password, Encryption_Key, People_ID) VALUES (?, ?, ?, ?);
@@ -58,7 +63,7 @@ class Database:
         self.cursor.execute(query, (role_name,))
         self.connection.commit()
 
-    def does_username_exist(self, username):
+    def username_available(self, username):
         query = """SELECT * FROM Login WHERE Username = ?;"""
         results = self.cursor.execute(query, (username,)).fetchall()
         if len(results) <= 0:
@@ -72,13 +77,13 @@ class Database:
         return results[0]
     
     def get_address_id(self, postcode):
-        postcode = postcode.upper().replace(" ", "")
+        postcode = self.format_postcode(postcode)
         query = """SELECT Address_ID FROM Address WHERE Postcode = ?;"""
         results = self.cursor.execute(query, (postcode,)).fetchone()
         return results[0]
     
     def address_exists(self, postcode):
-        postcode = postcode.upper().replace(" ", "")
+        postcode = self.format_postcode(postcode)
         query = """SELECT * FROM Address WHERE Postcode = ?;"""
         results = self.cursor.execute(query, (postcode,)).fetchone()
         if results is None:
@@ -87,7 +92,7 @@ class Database:
             return True
         
     def create_address_entry(self, address, postcode):
-        postcode = postcode.upper().replace(" ", "")
+        postcode = self.format_postcode(postcode)
         query = """INSERT INTO Address (Address, Postcode) VALUES (?, ?);"""
         self.cursor.execute(query, (address, postcode))
         self.connection.commit()
