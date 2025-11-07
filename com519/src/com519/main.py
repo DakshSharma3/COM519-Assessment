@@ -13,8 +13,8 @@ import os
 class Main(tk.Tk):
     def __init__(self):
         super().__init__()
-        # self.create_database()
-        self.databaseName = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
+        self.database_name = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
+        self.create_database()
         self.title("My Tkinter App")
         self.geometry("400x150")
         username = tk.StringVar()
@@ -41,15 +41,15 @@ class Main(tk.Tk):
         register_button.grid(column=2, row=2, padx=10, pady=10)
 
     def create_database(self):
-        if not os.path.exists(self.databaseName):
-            db = Database(self.databaseName)
+        if not os.path.exists(self.database_name):
+            db = Database(self.database_name)
             db.create_tables()
             db.disconnect()
 
     def login(self,username,password):
         username = username.get()
         password = password.get()
-        db = Database(self.databaseName)
+        db = Database(self.database_name)
         query ="""
         SELECT * FROM Login WHERE Username = ?;
         """

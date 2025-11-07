@@ -10,7 +10,7 @@ from database import Database
 class Register(tk.Toplevel):
     def __init__(self, parent, username_entry, password_entry):
         super().__init__(parent)
-        self.databaseName = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
+        self.database_name = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
         self.title("My Tkinter App")
         self.geometry("400x500")
         self.username = username_entry.get()
@@ -82,7 +82,7 @@ class Register(tk.Toplevel):
         branch_text = tk.Label(self, text="Branch: ", font=("Arial", 16))
         branch_text.grid(column=0, row=8, padx=10, pady=10)
 
-        branch_dropdown = ttk.Combobox(self, values=self.get_branch_names(Database(self.databaseName)), textvariable=branch, state="readonly")
+        branch_dropdown = ttk.Combobox(self, values=self.get_branch_names(Database(self.database_name)), textvariable=branch, state="readonly")
         branch_dropdown.grid(column=1, row=8, padx=10, pady=10)
 
         register_button = tk.Button(self, text="Register", command=partial(self.register, username_entry, password_entry, forename_entry, surname_entry, phone_number_entry, email_entry, address_entry, postcode_entry, branch) )
@@ -158,7 +158,7 @@ class Register(tk.Toplevel):
 #in db
     def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
         if self.valid_number(phone_number) and self.valid_email(email):
-            db = Database(self.databaseName)
+            db = Database(self.database_name)
             if not self.address_exists(postcode, db):
                 self.create_address_entry(address, postcode, db)
             branch_id = self.get_branch_id(branch, db)
@@ -190,7 +190,7 @@ class Register(tk.Toplevel):
     def register(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
         username = username.get()
         password = password.get()
-        db = Database(self.databaseName)
+        db = Database(self.database_name)
         if self.valid_username(username, db):
             if self.valid_password(password, db):
                 key = Fernet.generate_key()
