@@ -10,6 +10,7 @@ from database import Database
 class Register(tk.Toplevel):
     def __init__(self, parent, username_entry, password_entry):
         super().__init__(parent)
+        self.databaseName = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
         self.title("My Tkinter App")
         self.geometry("400x500")
         self.username = username_entry.get()
@@ -81,7 +82,7 @@ class Register(tk.Toplevel):
         branch_text = tk.Label(self, text="Branch: ", font=("Arial", 16))
         branch_text.grid(column=0, row=8, padx=10, pady=10)
 
-        branch_dropdown = ttk.Combobox(self, values=self.get_branch_names(Database("COM519.db")), textvariable=branch, state="readonly")
+        branch_dropdown = ttk.Combobox(self, values=self.get_branch_names(Database(self.databaseName)), textvariable=branch, state="readonly")
         branch_dropdown.grid(column=1, row=8, padx=10, pady=10)
 
         register_button = tk.Button(self, text="Register", command=partial(self.register, username_entry, password_entry, forename_entry, surname_entry, phone_number_entry, email_entry, address_entry, postcode_entry, branch) )
@@ -98,6 +99,7 @@ class Register(tk.Toplevel):
         print(postcode.get())
         print(branch.get())
 
+#in db
     def valid_username(self, username, db):
         query = """SELECT * FROM Login WHERE Username = ?;"""
         results = db.cursor.execute(query, (username,)).fetchall()
@@ -125,17 +127,18 @@ class Register(tk.Toplevel):
         valid_email = any(character == "@" for character in email.get())
         return valid_email
 
+#in db
     def get_branch_id(self, branch, db):
         query = """SELECT [Branch ID] FROM Branch WHERE [Branch Name] = ?;"""
         results = db.cursor.execute(query, (branch.get(),)).fetchone()
         return results[0]
-
+#in db
     def get_address_id(self, postcode, db):
         postcode = postcode.get().upper().replace(" ", "")
         query = """SELECT [Address ID] FROM Address WHERE Postcode = ?;"""
         results = db.cursor.execute(query, (postcode,)).fetchone()
         return results[0]
-
+#in db
     def address_exists(self, postcode, db):
         postcode = postcode.get().upper().replace(" ", "")
         query = """SELECT * FROM Address WHERE Postcode = ?;"""
@@ -145,16 +148,17 @@ class Register(tk.Toplevel):
         else:
             return True
 
+#in db
     def create_address_entry(self, address, postcode, db):
         postcode = postcode.get().upper().replace(" ", "")
         query = """INSERT INTO Address (Address, Postcode) VALUES (?, ?);"""
         db.cursor.execute(query, (address.get(), postcode))
         db.connection.commit()
 
-
+#in db
     def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
         if self.valid_number(phone_number) and self.valid_email(email):
-            db = Database("COM519.db")
+            db = Database(self.databaseName)
             if not self.address_exists(postcode, db):
                 self.create_address_entry(address, postcode, db)
             branch_id = self.get_branch_id(branch, db)
@@ -164,7 +168,7 @@ class Register(tk.Toplevel):
             db.connection.commit()
             db.disconnect()
             return True
-
+#in db
     def get_people_id(self, first_name, surname, phone_number, email, address, postcode, branch, db):
         branch_id = self.get_branch_id(branch, db)
         address_id = self.get_address_id(postcode, db)
@@ -176,6 +180,7 @@ class Register(tk.Toplevel):
         results = db.cursor.execute(query, (first_name.get(), surname.get(), address_id, phone_number.get(), email.get(), branch_id)).fetchone()
         return results[0]
 
+#in db
     def get_branch_names(self, db):
         query = """SELECT [Branch Name] FROM Branch;"""
         results = db.cursor.execute(query).fetchall()
@@ -185,7 +190,7 @@ class Register(tk.Toplevel):
     def register(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
         username = username.get()
         password = password.get()
-        db = Database("COM519.db")
+        db = Database(self.databaseName)
         if self.valid_username(username, db):
             if self.valid_password(password, db):
                 key = Fernet.generate_key()

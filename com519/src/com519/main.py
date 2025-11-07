@@ -14,6 +14,7 @@ class Main(tk.Tk):
     def __init__(self):
         super().__init__()
         # self.create_database()
+        self.databaseName = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
         self.title("My Tkinter App")
         self.geometry("400x150")
         username = tk.StringVar()
@@ -46,7 +47,7 @@ class Main(tk.Tk):
     def login(self,username,password):
         username = username.get()
         password = password.get()
-        db = Database("COM519.db")
+        db = Database(self.databaseName)
         query ="""
         SELECT * FROM Login WHERE Username = ?;
         """
