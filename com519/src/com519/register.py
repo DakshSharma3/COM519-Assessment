@@ -10,7 +10,7 @@ from database import Database
 class Register(tk.Toplevel):
     def __init__(self, parent, username_entry, password_entry):
         super().__init__(parent)
-        self.database_name = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
+        self.database_name = "COM519.db"
         self.title("My Tkinter App")
         self.geometry("400x500")
         self.username = username_entry.get()

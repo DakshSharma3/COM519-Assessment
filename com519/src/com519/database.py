@@ -35,6 +35,21 @@ class Database:
         for role in roles:
             self.adding_role(role)
 
+        triggers  = ['CREATE TRIGGER add_employee_id_to_login AFTER INSERT ON Employees FOR EACH ROW BEGIN UPDATE Login SET Employee_ID = NEW.Employee_ID WHERE People_ID = NEW.People_ID; END']
+
+        for trigger in triggers:
+            self.execute_create_query(trigger)
+            self.connection.commit()
+
+        admin_user_queries = [
+            'INSERT INTO Address (Address, Postcode) VALUES ("8 Cranmore","SO315GG");',
+            'INSERT INTO People(Forename, Surname, Address_ID, Phone_Number, Email, Branch_ID) VALUES("Daksh", "Sharma", 1, 7401570160, "Daksh@gmail.com", 2);',
+            'INSERT INTO Login (Username, Password, Encryption_Key, People_ID) VALUES ("admin", "gAAAAABpDz1yG_0BkQJADCiEtTphDWaEhTzBeDZq8RBqeaQ9Trqac0PGOa0Fy7-ZB3GYjENYYpYn9oE6CD2kDAY34i87su6lDw==", "mD6Zc0wDnggPpdtTQJrBXh9K1RWG6SYJj9SIYSftKkg=", 1);',
+            'INSERT INTO Employees (People_ID, Role_ID, Employee_Email) VALUES (1, 4, "Daksh@workEmail.com" );'
+        ]
+        for query in admin_user_queries:
+            self.execute_create_query(query)
+
         self.connection.commit()
 
 

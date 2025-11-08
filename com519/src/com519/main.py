@@ -13,7 +13,8 @@ import os
 class Main(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.database_name = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
+        #When using work laptop use C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db
+        self.database_name = "COM519.db"
         self.create_database()
         self.title("My Tkinter App")
         self.geometry("400x150")
