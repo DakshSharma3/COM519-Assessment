@@ -78,8 +78,6 @@ class Register(tk.Toplevel):
         email_entry = tk.Entry(self, textvariable=email)
         email_entry.grid(column=1, row=7, padx=10, pady=10)
 
-        branches = ["Southampton", "Oxford", "London", "Liverpool"]
-
         branch_text = tk.Label(self, text="Branch: ", font=("Arial", 16))
         branch_text.grid(column=0, row=8, padx=10, pady=10)
 
@@ -101,6 +99,21 @@ class Register(tk.Toplevel):
         print(branch.get())
 
     def valid_password(self, password):
+        """
+        Validates the password meets security requirements
+
+        Requirements needed
+        - 8 or more characters
+        - Contains a capital letter
+        - Contains a number
+        - Contains a special character
+
+        Args:
+            password: Password inputted by the user in the GUI
+
+        Returns: `True` if the password meets security requirements, otherwise `False`
+
+        """
         valid_length = len(password) >= 8
         has_digit = any(character.isdigit() for character in password)
         has_uppercase = any(character.isupper() for character in password)
@@ -112,14 +125,44 @@ class Register(tk.Toplevel):
             return False
 
     def valid_number(self, number):
+        """
+        Validates the phone number is a number and meets the required length
+        Args:
+            number: Phone number inputted by the user in the GUI
+
+        Returns: `True` if the phone number meets requirements, otherwise `False`
+
+        """
         valid_digit = number.get().isdigit() and len(number.get()) == 11
         return valid_digit
 
     def valid_email(self, email):
+        """
+        Validates the email address is in a valid format with the @ symbol present
+        Args:
+            email: Email address inputted by the user in the GUI
+
+        Returns: `True` if the `email` meets requirements, otherwise `False`
+
+        """
         valid_email = any(character == "@" for character in email.get())
         return valid_email
 
     def register(self, username, password, first_name, surname, phone_number, email, address, postcode, branch):
+        """
+        Registers the user into the system by validating the inputs and will the start to create new entries into the database. A message box will be displayed at the end to notify the user if the registration was successful or not
+
+        Args:
+            username: Username inputted by the user in the GUI
+            password: Password inputted by the user in the GUI
+            first_name: First name inputted by the user in the GUI
+            surname: Surname inputted by the user in the GUI
+            phone_number: Phone number inputted by the user in the GUI
+            email: Email address inputted by the user in the GUI
+            address: Address inputted by the user in the GUI
+            postcode: Postcode inputted by the user in the GUI
+            branch: Branch chosen by the user in the GUI
+        """
         username = username.get()
         password = password.get()
         if self.db.username_available(username):
@@ -129,7 +172,8 @@ class Register(tk.Toplevel):
                 password = cipher.encrypt(password.encode())
                 if self.valid_number(phone_number) and self.valid_email(email):
                     self.db.register_people(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
-                people_id = self.db.get_people_id(first_name.get(), surname.get(), phone_number.get(), email.get(), address.get(), postcode.get(), branch.get())
+                people_id = self.db.get_people_id(first_name.get(), surname.get(), phone_number.get(), email.get(),
+                                                  postcode.get(), branch.get())
                 self.db.create_login_entry(username, password, key, people_id)
                 messagebox.showinfo("Information", "Registration Successful")
                 self.db.disconnect()

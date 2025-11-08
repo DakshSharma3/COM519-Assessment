@@ -42,12 +42,20 @@ class Main(tk.Tk):
         register_button.grid(column=2, row=2, padx=10, pady=10)
 
     def create_database(self):
+        """Created the database if the .db file isn't present on startup"""
         if not os.path.exists(self.database_name):
             db = Database(self.database_name)
             db.create_tables()
             db.disconnect()
 
     def login(self,username,password):
+        """
+        validates the data inputted by the user by doing a lookup in the database and decrypting the password. If successful then the user is logged into the application.
+
+        Args:
+            username: username inputted by the user in the GUI
+            password: password inputted by the user in the GUI
+        """
         username = username.get()
         password = password.get()
         db = Database(self.database_name)
@@ -67,6 +75,13 @@ class Main(tk.Tk):
         db.disconnect()
 
     def open_window(self, username, password):
+        """
+        Opens the register window
+
+        Args:
+            username: username inputted by the user in the GUI
+            password: password inputted by the user in the GUI
+        """
         window = Register(self, username, password)
         window.grab_set()
         self.withdraw()

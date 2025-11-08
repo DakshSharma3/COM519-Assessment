@@ -7,10 +7,12 @@ class Database:
         self.cursor.execute("PRAGMA foreign_keys = ON;")
             
     def disconnect(self):
+        """Commits any data and disconnects the database connection   """
         self.connection.commit()
         self.connection.close()
 
     def create_tables(self):
+        """Creates all the tables and necessary entries within the database"""
         table_queries = [
             'CREATE TABLE IF NOT EXISTS Branch ("Branch_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Branch_Name" TEXT);',
             'CREATE TABLE IF NOT EXISTS Roles ("Role_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Role_Name" TEXT);',
@@ -55,12 +57,32 @@ class Database:
 
 
     def execute_create_query(self, query):
+        """
+        Executes a SQL query
+
+        Args:
+            query: query to be executed
+        """
         self.cursor.execute(query)
 
     def format_postcode(self, postcode):
+        """
+        Formats a postcode
+
+        Args:
+            postcode: Postcode to be formatted
+        """
         return postcode.upper().replace(" ", "")
 
     def create_login_entry(self, username, password, encryption_key, people_id):
+        """
+        Creates a login entry in the database
+        Args:
+            username: Username inputted by the user in the GUI
+            password: Password inputted by the user in the GUI
+            encryption_key: Generated encryption key for password
+            people_id: ID relating to the already created entry in the People table
+        """
         query = """
         INSERT INTO Login (Username, Password, Encryption_Key, People_ID) VALUES (?, ?, ?, ?);
         """
@@ -69,16 +91,33 @@ class Database:
         self.connection.commit()
 
     def adding_branch(self, branch_name):
+        """
+        Adds a branch to the database
+        Args:
+            branch_name: Branch to be added
+        """
         query = """INSERT INTO Branch (Branch_Name) VALUES (?);"""
         self.cursor.execute(query, (branch_name,))
         self.connection.commit()
 
     def adding_role(self, role_name):
+        """
+        Adds a role to the database
+        Args:
+            role_name: Role to be added
+        """
         query = """INSERT INTO Roles (Role_Name) VALUES (?);"""
         self.cursor.execute(query, (role_name,))
         self.connection.commit()
 
     def username_available(self, username):
+        """
+        Checks if the username exists in the database
+        Args:
+            username: Username to be checked
+
+        Returns: true if username is available to use, otherwise false
+        """
         query = """SELECT * FROM Login WHERE Username = ?;"""
         results = self.cursor.execute(query, (username,)).fetchall()
         if len(results) <= 0:
@@ -87,17 +126,38 @@ class Database:
             return False
 
     def get_branch_id(self, branch):
+        """
+        Gets a branch id from the database
+        Args:
+            branch: Branch to get the ID from
+
+        Returns: branch id
+        """
         query = """SELECT Branch_ID FROM Branch WHERE Branch_Name = ?;"""
         results = self.cursor.execute(query, (branch,)).fetchone()
         return results[0]
     
     def get_address_id(self, postcode):
+        """
+        Gets an address id from the database
+        Args:
+            postcode: Postcode to get the ID from
+
+        Returns: address id
+        """
         postcode = self.format_postcode(postcode)
         query = """SELECT Address_ID FROM Address WHERE Postcode = ?;"""
         results = self.cursor.execute(query, (postcode,)).fetchone()
         return results[0]
     
     def address_exists(self, postcode):
+        """
+        Checks if the address exists in the database
+        Args:
+            postcode: Postcode to check from
+
+        Returns: true if address exists, otherwise false
+        """
         postcode = self.format_postcode(postcode)
         query = """SELECT * FROM Address WHERE Postcode = ?;"""
         results = self.cursor.execute(query, (postcode,)).fetchone()
@@ -107,12 +167,30 @@ class Database:
             return True
         
     def create_address_entry(self, address, postcode):
+        """
+        Creates an address entry in the database
+        Args:
+            address: Address to be added
+            postcode: Postcode to be added
+        """
         postcode = self.format_postcode(postcode)
         query = """INSERT INTO Address (Address, Postcode) VALUES (?, ?);"""
         self.cursor.execute(query, (address, postcode))
         self.connection.commit()
 
-    def get_people_id(self, first_name, surname, phone_number, email, address, postcode, branch):
+    def get_people_id(self, first_name, surname, phone_number, email, postcode, branch):
+        """
+        Gets a people id from the database
+        Args:
+            first_name: First name of the user
+            surname:  Surname of the user
+            phone_number: Phone number of the user
+            email: Email of the user
+            postcode: Postcode of the user
+            branch: Branch of the user
+
+        Returns: People ID
+        """
         branch_id = self.get_branch_id(branch)
         address_id = self.get_address_id(postcode)
         query = """
@@ -124,11 +202,26 @@ class Database:
         return results[0]
     
     def get_branch_names(self):
+        """Gets all branch names avaliable from the database"""
         query = """SELECT Branch_Name FROM Branch;"""
         results = self.cursor.execute(query).fetchall()
         return results
     
     def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
+        """
+        Registers a new person entry in the database
+        Args:
+            first_name: First name of the user
+            surname:  Surname of the user
+            phone_number: Phone number of the user
+            email: Email of the user
+            address: Address of the user
+            postcode: Postcode of the user
+            branch: Branch of the user
+
+        Returns: True
+
+        """
         if not self.address_exists(postcode):
             self.create_address_entry(address, postcode)
         branch_id = self.get_branch_id(branch)
