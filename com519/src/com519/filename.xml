@@ -1,0 +1,14 @@
+<root>
+    <credentials>
+        <Username>admin</Username>
+        <Password>password</Password>
+    </credentials>
+    <credentials>
+        <Username>admin1</Username>
+        <Password>password1</Password>
+    </credentials>
+    <credentials>
+        <Username>admin2</Username>
+        <Password>password2</Password>
+    </credentials>
+</root>
