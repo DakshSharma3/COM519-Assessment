@@ -83,10 +83,17 @@ class Main(tk.Tk):
             password: password inputted by the user in the GUI
         """
         window = Register(self, username, password)
+        window.protocol("WM_DELETE_WINDOW", window.on_closing)
         window.grab_set()
         self.withdraw()
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+
 
 
 
 main = Main()
+main.protocol("WM_DELETE_WINDOW", main.on_closing)
 main.mainloop()

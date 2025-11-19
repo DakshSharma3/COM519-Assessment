@@ -184,4 +184,8 @@ class Register(tk.Toplevel):
             messagebox.showerror("Error", "Registration Failed, username may already exist")
             self.db.disconnect()
 
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+
 
