@@ -152,6 +152,18 @@ class Database:
         query = """SELECT Branch_ID FROM Branch WHERE Branch_Name = ?;"""
         results = self.cursor.execute(query, (branch,)).fetchone()
         return results[0]
+
+    def get_account_type_id(self, account_type):
+        """
+        Gets an account type id from the database
+        Args:
+            account_type: Account type to get the ID from
+
+        Returns: account type id
+        """
+        query = """SELECT Account_Type_ID FROM Account_Type WHERE Account_Type = ?;"""
+        results = self.cursor.execute(query, (account_type,)).fetchone()
+        return results[0]
     
     def get_address_id(self, postcode):
         """
@@ -250,5 +262,11 @@ class Database:
         address_id = self.get_address_id(postcode)
         query = """INSERT INTO People (Forename, Surname, Address_ID, Phone_Number, Email, Branch_ID) VALUES (?, ?, ?, ?, ?, ?)"""
         self.cursor.execute(query, (first_name, surname, address_id, phone_number, email, branch_id))
+        self.connection.commit()
+        return True
+
+    def register_account(self, account_type, people_id):
+        query = "INSERT INTO Account_Type (Account_Type, People_ID) VALUES (?, ?);"
+        self.cursor.execute(query, (account_type, people_id))
         self.connection.commit()
         return True

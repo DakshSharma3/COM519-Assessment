@@ -89,7 +89,8 @@ class Main(tk.Tk):
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.destroy()
+            exit()
+            # self.destroy()
 
 
 

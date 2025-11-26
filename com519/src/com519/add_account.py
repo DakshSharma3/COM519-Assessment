@@ -14,15 +14,9 @@ class AddAccount(tk.Toplevel):
         self.title("My Tkinter App")
         self.geometry("350x200")
         account_type = tk.StringVar()
-        surname = tk.StringVar()
-        address = tk.StringVar()
-        postcode = tk.StringVar()
-        phone_number = tk.StringVar()
-        email = tk.StringVar()
-        branch = tk.StringVar()
         self.db = Database(self.database_name)
 
-        for i in range (0,2):
+        for i in range (0,3):
             self.rowconfigure(i, weight=1)
         for i in range (0,2):
             self.columnconfigure(i, weight=1)
@@ -36,9 +30,16 @@ class AddAccount(tk.Toplevel):
         account_type_dropdown = ttk.Combobox(self, values=self.db.get_account_type_names(), textvariable=account_type, state="readonly")
         account_type_dropdown.grid(column=1, row=1, padx=10)
 
+        register_button = tk.Button(self, text="Register Account" )
+        register_button.grid(column=0, row=2, padx=10, pady=10, columnspan=2)
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.destroy()
+            exit()
+
+    def register_account(self, account_type):
+        account_type_id = self.db.get_account_type_id(account_type)
+        if account_type_id != None:
+            self.db.register_account(account_type)
 
 
