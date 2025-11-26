@@ -6,6 +6,7 @@ from functools import partial
 from tkinter import ttk
 from cryptography.fernet import Fernet
 
+from main_menu import MainMenu
 from register import Register
 from database import Database
 import os
@@ -38,7 +39,7 @@ class Main(tk.Tk):
         login_button = tk.Button(self, text="Login", command= partial(self.login, username_entry, password_entry))
         login_button.grid(column=0, row=2, padx=10, pady=10)
 
-        register_button = tk.Button(self, text="Register", command= partial(self.open_window, username_entry, password_entry))
+        register_button = tk.Button(self, text="Register", command= partial(self.open_register_window, username_entry, password_entry))
         register_button.grid(column=2, row=2, padx=10, pady=10)
 
     def create_database(self):
@@ -68,13 +69,13 @@ class Main(tk.Tk):
             cipher = Fernet(results[3])
 
             if results[1] ==  username and cipher.decrypt(results[2]).decode() == password:
-                messagebox.showinfo("Information", "Login Successful")
+                self.open_menu_window(db.get_user_id(username))
         else:
             messagebox.showerror("Error", "Login Failed, no such user")
 
         db.disconnect()
 
-    def open_window(self, username, password):
+    def open_register_window(self, username, password):
         """
         Opens the register window
 
@@ -87,10 +88,21 @@ class Main(tk.Tk):
         window.grab_set()
         self.withdraw()
 
+    def open_menu_window(self, user_id):
+        """
+        Opens the main meny window
+
+        Args:
+            user_id: ID of the logged-in user
+        """
+        window = MainMenu(self, user_id)
+        window.protocol("WM_DELETE_WINDOW", window.on_closing)
+        window.grab_set()
+        self.withdraw()
+
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             exit()
-            # self.destroy()
 
 
 

@@ -164,6 +164,18 @@ class Database:
         query = """SELECT Account_Type_ID FROM Account_Type WHERE Account_Type = ?;"""
         results = self.cursor.execute(query, (account_type,)).fetchone()
         return results[0]
+
+    def get_user_id(self, username):
+        """
+        Gets a user id from the database
+        Args:
+            username: username of the account to get the ID from
+
+        Returns: user id
+        """
+        query = """SELECT User_ID FROM Login WHERE Username = ?;"""
+        results = self.cursor.execute(query, (username,)).fetchone()
+        return results[0]
     
     def get_address_id(self, postcode):
         """

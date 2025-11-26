@@ -186,6 +186,6 @@ class Register(tk.Toplevel):
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.destroy()
+            exit()
 
 

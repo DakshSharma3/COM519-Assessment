@@ -8,13 +8,14 @@ from add_account import AddAccount
 from database import Database
 
 
-class MainMenu(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class MainMenu(tk.Toplevel):
+    def __init__(self, parent, user_id):
+        super().__init__(parent)
         self.database_name = "COM519.db"
         self.title("Main Menu")
         self.geometry("300x300")
         self.db = Database(self.database_name)
+        self.user_id = user_id
 
         for i in range (0,3):
             self.rowconfigure(i, weight=1)
@@ -37,8 +38,8 @@ class MainMenu(tk.Tk):
         view_appointment_button.grid(column=1, row=2, padx=10, pady=10)
 
     def on_closing(self):
-        # if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        self.destroy()
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            exit()
 
     def open_window(self):
         """ Opens the add account window """
@@ -48,6 +49,6 @@ class MainMenu(tk.Tk):
         self.withdraw()
 
 
-main = MainMenu()
-main.protocol("WM_DELETE_WINDOW", main.on_closing)
-main.mainloop()
+# main = MainMenu()
+# main.protocol("WM_DELETE_WINDOW", main.on_closing)
+# main.mainloop()
