@@ -4,6 +4,7 @@ from tkinter import ttk, messagebox
 
 from cryptography.fernet import Fernet
 
+from add_account import AddAccount
 from database import Database
 
 
@@ -23,7 +24,7 @@ class MainMenu(tk.Tk):
         main_menu_text = tk.Label(self, text="Main Menu", font=("Arial", 16))
         main_menu_text.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
 
-        add_account_button = tk.Button(self, text="Add Account")
+        add_account_button = tk.Button(self, text="Add Account", command= self.open_window)
         add_account_button.grid(column=0, row=1, padx=10, pady=10)
 
         view_account_button = tk.Button(self, text="View Account")
@@ -38,6 +39,14 @@ class MainMenu(tk.Tk):
     def on_closing(self):
         # if messagebox.askokcancel("Quit", "Do you want to quit?"):
         self.destroy()
+
+    def open_window(self):
+        """ Opens the add account window """
+        window = AddAccount(self)
+        window.protocol("WM_DELETE_WINDOW", window.on_closing)
+        window.grab_set()
+        self.withdraw()
+
 
 main = MainMenu()
 main.protocol("WM_DELETE_WINDOW", main.on_closing)

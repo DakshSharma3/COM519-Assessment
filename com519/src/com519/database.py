@@ -20,7 +20,8 @@ class Database:
             'CREATE TABLE IF NOT EXISTS People ("People_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Forename" TEXT, "Surname" TEXT, "Address_ID" INTEGER REFERENCES Address("Address_ID"), "Phone_Number" INTEGER, "Email" TEXT, "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"));',
             'CREATE TABLE IF NOT EXISTS Employees ("Employee_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Role_ID" INTEGER REFERENCES Roles("Role_ID"), "Employee_Email" TEXT);',
             'CREATE TABLE IF NOT EXISTS Login ("User_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Username" TEXT, "Password" TEXT, "Encryption_Key" TEXT, "People_ID" INTEGER REFERENCES People("People_ID"), "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"));',
-            'CREATE TABLE IF NOT EXISTS Accounts ("Account_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Account_Type" TEXT, "Balance" REAL DEFAULT (0.0));',
+            'CREATE TABLE IF NOT EXISTS Account_Type ( Account_Type_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Account_Type TEXT UNIQUE );'
+            'CREATE TABLE IF NOT EXISTS Accounts (Account_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, People_ID INTEGER REFERENCES People (People_ID), Account_Type_ID TEXT REFERENCES Account_type (Account_Type_ID), Balance REAL DEFAULT (0.0));',
             'CREATE TABLE IF NOT EXISTS Appointments ("Appointment_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"), "People_ID" INTEGER REFERENCES People("People_ID"), "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"), "Date" TEXT, "Time" INTEGER, "Purpose" TEXT);'
         ]
     
@@ -36,6 +37,11 @@ class Database:
 
         for role in roles:
             self.adding_role(role)
+
+        account_types = ["Checking", "Saving", "Student", "Joint"]
+
+        for account_type in account_types:
+            self.adding_account_type(account_type)
 
         triggers  = ['CREATE TRIGGER add_employee_id_to_login AFTER INSERT ON Employees FOR EACH ROW BEGIN UPDATE Login SET Employee_ID = NEW.Employee_ID WHERE People_ID = NEW.People_ID; END']
 
@@ -108,6 +114,16 @@ class Database:
         """
         query = """INSERT INTO Roles (Role_Name) VALUES (?);"""
         self.cursor.execute(query, (role_name,))
+        self.connection.commit()
+
+    def adding_account_type(self, account_name):
+        """
+        Adds an Account Type to the database
+        Args:
+            account_name: Account Type to be added
+        """
+        query = """INSERT INTO Account_Type (Account_Type) VALUES (?);"""
+        self.cursor.execute(query, (account_name,))
         self.connection.commit()
 
     def username_available(self, username):
@@ -204,6 +220,12 @@ class Database:
     def get_branch_names(self):
         """Gets all branch names avaliable from the database"""
         query = """SELECT Branch_Name FROM Branch;"""
+        results = self.cursor.execute(query).fetchall()
+        return results
+
+    def get_account_type_names(self):
+        """Gets all account type names avaliable from the database"""
+        query = """SELECT Account_Type FROM Account_Type;"""
         results = self.cursor.execute(query).fetchall()
         return results
     
