@@ -34,10 +34,16 @@ class AddAccount(tk.Toplevel):
         register_button.grid(column=0, row=2, padx=10, pady=10, columnspan=2)
 
     def on_closing(self):
+        """Closes the application"""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             exit()
 
     def register_account(self, account_type):
+        """
+        Registers a bank account for the user
+        :param account_type: The type of account they want to create
+        :return:
+        """
         account_type_id = self.db.get_account_type_id(account_type)
         if account_type_id != None:
             self.db.register_account(account_type)

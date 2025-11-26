@@ -28,10 +28,8 @@ class Main(tk.Tk):
         username_entry = tk.Entry(self, textvariable=username)
         username_entry.grid(column=1, row=0, padx=10, pady=10)
 
-
         password_text = tk.Label(self, text="Password: ", font=("Arial", 16))
         password_text.grid(column=0, row=1, padx=10, pady=10)
-
 
         password_entry = tk.Entry(self, textvariable=password, show="*")
         password_entry.grid(column=1, row=1, padx=10, pady=10)
@@ -101,11 +99,9 @@ class Main(tk.Tk):
         self.withdraw()
 
     def on_closing(self):
+        """Closes the application"""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             exit()
-
-
-
 
 main = Main()
 main.protocol("WM_DELETE_WINDOW", main.on_closing)

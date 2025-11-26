@@ -38,6 +38,7 @@ class MainMenu(tk.Toplevel):
         view_appointment_button.grid(column=1, row=2, padx=10, pady=10)
 
     def on_closing(self):
+        """Closes the application"""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             exit()
 

@@ -185,7 +185,6 @@ class Register(tk.Toplevel):
             self.db.disconnect()
 
     def on_closing(self):
+        """Closes the application"""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             exit()
-
-
