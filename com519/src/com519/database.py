@@ -49,6 +49,12 @@ class Database:
             self.execute_create_query(trigger)
             self.connection.commit()
 
+        views = ['CREATE VIEW view_accounts AS SELECT at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;']
+
+        for view in views:
+            self.execute_create_query(view)
+            self.connection.commit()
+
         admin_user_queries = [
             'INSERT INTO Address (Address, Postcode) VALUES ("8 Cranmore","SO315GG");',
             'INSERT INTO People(Forename, Surname, Address_ID, Phone_Number, Email, Branch_ID) VALUES("Daksh", "Sharma", 1, 7401570160, "Daksh@gmail.com", 2);',
