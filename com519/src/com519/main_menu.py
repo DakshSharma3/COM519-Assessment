@@ -25,7 +25,7 @@ class MainMenu(tk.Toplevel):
         main_menu_text = tk.Label(self, text="Main Menu", font=("Arial", 16))
         main_menu_text.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
 
-        add_account_button = tk.Button(self, text="Add Account", command= self.open_window)
+        add_account_button = tk.Button(self, text="Add Account", command= partial(self.open_window, self.user_id))
         add_account_button.grid(column=0, row=1, padx=10, pady=10)
 
         view_account_button = tk.Button(self, text="View Account")
@@ -42,9 +42,9 @@ class MainMenu(tk.Toplevel):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             exit()
 
-    def open_window(self):
+    def open_window(self, user_id):
         """ Opens the add account window """
-        window = AddAccount(self)
+        window = AddAccount(self, user_id)
         window.protocol("WM_DELETE_WINDOW", window.on_closing)
         window.grab_set()
         self.withdraw()

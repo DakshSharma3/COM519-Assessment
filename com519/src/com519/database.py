@@ -240,6 +240,16 @@ class Database:
         """
         results = self.cursor.execute(query, (first_name, surname, address_id, phone_number, email, branch_id)).fetchone()
         return results[0]
+
+    def get_people_id_from_user_id(self,user_id):
+        """
+        Gets a people id from the database
+        :param user_id: the id of the current user logged into the system
+        :return: ID of the users general account
+        """
+        query = """SELECT People_ID FROM Login WHERE User_ID = ?;"""
+        results = self.cursor.execute(query, (user_id,)).fetchone()
+        return results[0]
     
     def get_branch_names(self):
         """Gets all branch names avaliable from the database"""
@@ -278,7 +288,13 @@ class Database:
         return True
 
     def register_account(self, account_type, people_id):
-        query = "INSERT INTO Account_Type (Account_Type, People_ID) VALUES (?, ?);"
+        """
+        Creates a new account entry in the database
+        :param account_type: The type of bank account to register
+        :param people_id: Who owns the account
+        :return: True after completion
+        """
+        query = "INSERT INTO Accounts (Account_Type_ID, People_ID) VALUES (?, ?);"
         self.cursor.execute(query, (account_type, people_id))
         self.connection.commit()
         return True
