@@ -49,7 +49,7 @@ class Database:
             self.execute_create_query(trigger)
             self.connection.commit()
 
-        views = ['CREATE VIEW view_accounts AS SELECT at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;']
+        views = ['CREATE VIEW View_Accounts AS SELECT a.People_ID, at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;']
 
         for view in views:
             self.execute_create_query(view)
@@ -256,6 +256,11 @@ class Database:
         query = """SELECT People_ID FROM Login WHERE User_ID = ?;"""
         results = self.cursor.execute(query, (user_id,)).fetchone()
         return results[0]
+
+    def get_all_user_bank_accounts(self, user_id):
+        query = """SELECT * FROM View_Accounts WHERE People_ID = ?;"""
+        results = self.cursor.execute(query, (self.get_people_id_from_user_id(user_id),)).fetchall()
+        return results
     
     def get_branch_names(self):
         """Gets all branch names avaliable from the database"""
