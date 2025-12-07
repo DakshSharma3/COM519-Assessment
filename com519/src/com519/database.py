@@ -1,5 +1,8 @@
 import sqlite3
 
+from com519.user import User
+
+
 class Database:
     def __init__(self, db_string):
         self.connection = sqlite3.connect(db_string)
@@ -49,7 +52,8 @@ class Database:
             self.execute_create_query(trigger)
             self.connection.commit()
 
-        views = ['CREATE VIEW View_Accounts AS SELECT a.People_ID, at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;']
+        views = ['CREATE VIEW View_Accounts AS SELECT a.People_ID, at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;',
+                 'CREATE VIEW People_Info AS SELECT l.User_ID, p.People_ID, p.Forename, p.Surname, a.Address, a.Postcode, p.Phone_number, p.Email, b.Branch_Name, e.Employee_ID, r.Role_Name, e.Employee_Email FROM People p INNER JOIN Login l on p.People_ID = l.People_ID INNER JOIN Address a on a.Address_ID = p.Address_ID INNER JOIN Branch b on b.Branch_ID = p.Branch_ID LEFT JOIN Employees e on p.People_ID = e.People_ID LEFT JOIN Roles r on e.Role_ID = r.Role_ID;']
 
         for view in views:
             self.execute_create_query(view)
@@ -309,3 +313,9 @@ class Database:
         self.cursor.execute(query, (account_type, people_id))
         self.connection.commit()
         return True
+
+    def generate_user_object(self, user_id):
+        query = "SELECT * FROM People_Info WHERE User_ID = ?;"
+        result = self.cursor.execute(query, (user_id,)).fetchone()
+        user = User(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8], (result[9] is not None), result[9], result[10], result[11])
+        return user
