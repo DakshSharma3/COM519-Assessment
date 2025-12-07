@@ -1,6 +1,6 @@
 import sqlite3
 
-from com519.user import User
+from com519.bank_user import User
 
 
 class Database:
@@ -261,9 +261,9 @@ class Database:
         results = self.cursor.execute(query, (user_id,)).fetchone()
         return results[0]
 
-    def get_all_user_bank_accounts(self, user_id):
+    def get_all_user_bank_accounts(self, people_id):
         query = """SELECT * FROM View_Accounts WHERE People_ID = ?;"""
-        results = self.cursor.execute(query, (self.get_people_id_from_user_id(user_id),)).fetchall()
+        results = self.cursor.execute(query, (people_id,)).fetchall()
         return results
     
     def get_branch_names(self):

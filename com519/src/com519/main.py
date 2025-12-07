@@ -67,7 +67,8 @@ class Main(tk.Tk):
             cipher = Fernet(results[3])
 
             if results[1] ==  username and cipher.decrypt(results[2]).decode() == password:
-                self.open_menu_window(db.get_user_id(username))
+                user_id = db.get_user_id(username)
+                self.open_menu_window(db.generate_user_object(user_id))
         else:
             messagebox.showerror("Error", "Login Failed, no such user")
 
@@ -86,14 +87,14 @@ class Main(tk.Tk):
         window.grab_set()
         self.withdraw()
 
-    def open_menu_window(self, user_id):
+    def open_menu_window(self, user):
         """
         Opens the main meny window
 
         Args:
             user_id: ID of the logged-in user
         """
-        window = MainMenu(self, user_id)
+        window = MainMenu(self, user)
         window.protocol("WM_DELETE_WINDOW", window.on_closing)
         window.grab_set()
         self.withdraw()

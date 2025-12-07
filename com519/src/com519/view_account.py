@@ -1,16 +1,15 @@
 import tkinter as tk
 from functools import partial
 from tkinter import ttk, messagebox
-
 from cryptography.fernet import Fernet
 
 from database import Database
 
 
 class ViewAccount(tk.Toplevel):
-    def __init__(self, parent, user_id):
+    def __init__(self, parent, user):
         super().__init__(parent)
-        self.user_id = user_id
+        self.user = user
         self.database_name = "COM519.db"
         self.title("My Tkinter App")
         self.geometry("350x400")
@@ -36,7 +35,7 @@ class ViewAccount(tk.Toplevel):
         available_account_listbox.bind('<<ListboxSelect>>', self.action())
 
         available_account_listbox.grid(column=0, row=1, padx=10)
-        for account in self.db.get_all_user_bank_accounts(user_id):
+        for account in self.db.get_all_user_bank_accounts(self.user.get_people_id()):
             available_account_listbox.insert(tk.END, account[1])
 
         specific_account_listbox = tk.Listbox(self, height=10,

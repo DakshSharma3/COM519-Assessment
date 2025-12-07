@@ -14,6 +14,9 @@ class User:
         self.__employee_email = employee_email
         self.__appointments = []
         self.__accounts = []
+        from com519.database import Database
+        self.database_name = "COM519.db"
+        self.db = Database(self.database_name)
 
     def get_people_id(self):
         return self.__people_id
@@ -83,6 +86,11 @@ class User:
 
     def get_appointments(self):
         return self.__appointments
+
+    def load_appointments(self):
+        query = """SELECT Appointment_ID FROM Appointments WHERE People_ID = ?;"""
+        query = """SELECT Appointment_ID FROM Appointments WHERE Employee_ID = ?;"""
+
 
 
 

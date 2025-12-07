@@ -1,7 +1,6 @@
 import tkinter as tk
 from functools import partial
 from tkinter import ttk, messagebox
-
 from cryptography.fernet import Fernet
 
 from add_account import AddAccount
@@ -10,13 +9,13 @@ from database import Database
 
 
 class MainMenu(tk.Toplevel):
-    def __init__(self, parent, user_id):
+    def __init__(self, parent, user):
         super().__init__(parent)
         self.database_name = "COM519.db"
         self.title("Main Menu")
         self.geometry("300x300")
         self.db = Database(self.database_name)
-        self.user_id = user_id
+        self.user = user
 
         for i in range (0,3):
             self.rowconfigure(i, weight=1)
@@ -26,10 +25,10 @@ class MainMenu(tk.Toplevel):
         main_menu_text = tk.Label(self, text="Main Menu", font=("Arial", 16))
         main_menu_text.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
 
-        add_account_button = tk.Button(self, text="Add Account", command= partial(self.open_window, self.user_id, AddAccount))
+        add_account_button = tk.Button(self, text="Add Account", command= partial(self.open_window, self.user, AddAccount))
         add_account_button.grid(column=0, row=1, padx=10, pady=10)
 
-        view_account_button = tk.Button(self, text="View Account", command= partial(self.open_window, self.user_id, ViewAccount))
+        view_account_button = tk.Button(self, text="View Account", command= partial(self.open_window, self.user, ViewAccount))
         view_account_button.grid(column=1, row=1, padx=10, pady=10)
 
         add_appointment_button = tk.Button(self, text="Add Appointment")

@@ -8,9 +8,9 @@ from database import Database
 
 
 class AddAccount(tk.Toplevel):
-    def __init__(self, parent, user_id):
+    def __init__(self, parent, user):
         super().__init__(parent)
-        self.user_id = user_id
+        self.user = user
         self.database_name = "COM519.db"
         self.title("My Tkinter App")
         self.geometry("350x200")
@@ -45,12 +45,12 @@ class AddAccount(tk.Toplevel):
         :return:
         """
         account_type = self.account_type.get()
-        print(self.user_id)
         print(self.account_type.get())
 
         account_type_id = self.db.get_account_type_id(account_type)
         if account_type_id is not None:
-            people_id = self.db.get_people_id_from_user_id(self.user_id)
+            people_id = self.user.get_people_id()
             self.db.register_account(account_type_id, people_id)
+            messagebox.showinfo("Success", "Account successfully registered!")
 
 
