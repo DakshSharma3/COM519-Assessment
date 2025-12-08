@@ -14,6 +14,7 @@ class User:
         self.__employee_email = employee_email
         self.__appointments = []
         self.__accounts = []
+        # Import added here to avoid circular import error
         from com519.database import Database
         self.database_name = "COM519.db"
         self.db = Database(self.database_name)

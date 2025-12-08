@@ -24,7 +24,7 @@ class ViewAccount(tk.Toplevel):
         main_menu_text = tk.Label(self, text="View Account", font=("Arial", 16))
         main_menu_text.grid(column=0, row=0, padx=10, pady=10)
 
-        available_account_listbox = tk.Listbox(self, height=10,
+        self.available_account_listbox = tk.Listbox(self, height=10,
                              width=15,
                              bg="grey",
                              activestyle='dotbox',
@@ -32,25 +32,25 @@ class ViewAccount(tk.Toplevel):
                              fg="yellow",
                              listvariable=self.account_type,
                              selectmode="single")
-        available_account_listbox.bind('<<ListboxSelect>>', self.action())
+        self.available_account_listbox.bind('<<ListboxSelect>>', self.action)
 
-        available_account_listbox.grid(column=0, row=1, padx=10)
+        self.available_account_listbox.grid(column=0, row=1, padx=10)
         for account in self.db.get_all_user_bank_accounts(self.user.get_people_id()):
-            available_account_listbox.insert(tk.END, account[1])
+            self.available_account_listbox.insert(tk.END, account[1])
 
-        specific_account_listbox = tk.Listbox(self, height=10,
-                             width=15,
-                             bg="grey",
-                             activestyle='dotbox',
-                             font="Helvetica",
-                             fg="yellow")
+        # specific_account_listbox = tk.Listbox(self, height=10,
+        #                      width=15,
+        #                      bg="grey",
+        #                      activestyle='dotbox',
+        #                      font="Helvetica",
+        #                      fg="yellow")
 
         register_button = tk.Button(self, text="Register Account")
         register_button.grid(column=0, row=2, padx=10, pady=10, columnspan=2)
 
 
-    def action(self):
-        print(self.account_type)
+    def action(self, event):
+        print("Account Type is " , self.available_account_listbox.get(self.available_account_listbox.curselection()))
 
     def on_closing(self):
         """Closes the application"""
