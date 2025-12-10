@@ -15,7 +15,7 @@ class User:
         self.__appointments = []
         self.__accounts = []
         # Import added here to avoid circular import error
-        from com519.database import Database
+        from database import Database
         self.database_name = "COM519.db"
         self.db = Database(self.database_name)
 

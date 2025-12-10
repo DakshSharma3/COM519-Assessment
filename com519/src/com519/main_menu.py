@@ -4,7 +4,7 @@ from tkinter import ttk, messagebox
 from cryptography.fernet import Fernet
 
 from add_account import AddAccount
-from com519.view_account import ViewAccount
+from view_account import ViewAccount
 from database import Database
 
 

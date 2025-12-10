@@ -10,6 +10,7 @@ from database import Database
 class AddAccount(tk.Toplevel):
     def __init__(self, parent, user):
         super().__init__(parent)
+        self.parent = parent
         self.user = user
         self.database_name = "COM519.db"
         self.title("My Tkinter App")
@@ -36,8 +37,9 @@ class AddAccount(tk.Toplevel):
 
     def on_closing(self):
         """Closes the application"""
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            exit()
+        self.parent.update()
+        self.parent.deiconify()
+        self.destroy()
 
     def register_account(self):
         """

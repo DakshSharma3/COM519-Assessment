@@ -1,6 +1,6 @@
 import sqlite3
 
-from com519.bank_user import User
+from bank_user import User
 
 
 class Database:
