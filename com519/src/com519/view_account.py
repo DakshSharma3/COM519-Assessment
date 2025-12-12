@@ -1,8 +1,5 @@
 import tkinter as tk
-from functools import partial
-from tkinter import ttk, messagebox
-from cryptography.fernet import Fernet
-
+from tkinter import messagebox
 from database import Database
 
 
@@ -42,7 +39,7 @@ class ViewAccount(tk.Toplevel):
         self.available_account_listbox.grid(column=0, row=1, padx=10, columnspan=2, rowspan=2)
         print(self.accounts[1])
         for account in self.accounts:
-            self.available_account_listbox.insert(tk.END, account[1])
+            self.available_account_listbox.insert(tk.END, account[2])
 
         account_type_text = tk.Label(self, text="Account Type: ", font=("Arial", 12))
         account_type_text.grid(column=2, row=1, padx=10, pady=10)
@@ -56,22 +53,12 @@ class ViewAccount(tk.Toplevel):
         self.balance_entry = tk.Entry(self, textvariable=self.balance)
         self.balance_entry.grid(column=3, row=2, padx=10, pady=10, sticky="w")
 
-        # self.specific_account_listbox = tk.Listbox(self, height=10,
-        #                      width=22,
-        #                      bg="white",
-        #                      activestyle='dotbox',
-        #                      font="Helvetica",
-        #                      fg="yellow",
-        #                      selectmode="browse")
-        # self.specific_account_listbox.grid(column=2, row=1, padx=10)
-
-
-
+        self.confirm_balance_button = tk.Button(self, text="Confirm balance", command=self.change_balance)
 
     def action(self, event):
-        # print("Account Type is " , self.available_account_listbox.get(self.available_account_listbox.curselection()))
-        print("Account Type is ", self.available_account_listbox.curselection()[0])
-        self.selected_account = self.accounts[self.available_account_listbox.curselection()[0]]
+        selection = self.available_account_listbox.curselection()[0]
+        self.confirm_balance_button.grid_forget()
+        self.selected_account = self.accounts[selection]
         self.fill_selected_account_list()
         change_balance_button = tk.Button(self, text="Change balance", command=self.changing_balance)
         change_balance_button.grid(column=0, row=3, padx=10, pady=10, columnspan=2)
@@ -81,10 +68,10 @@ class ViewAccount(tk.Toplevel):
         self.account_type_entry.config(state=tk.NORMAL)
         self.balance_entry.config(state=tk.NORMAL)
         self.account_type_entry.delete(0, tk.END)
-        self.account_type_entry.insert(tk.END, self.selected_account[1])
+        self.account_type_entry.insert(tk.END, self.selected_account[2])
         self.account_type_entry.config(state=tk.DISABLED)
         self.balance_entry.delete(0, tk.END)
-        self.balance_entry.insert(tk.END, self.selected_account[2])
+        self.balance_entry.insert(tk.END, self.selected_account[3])
         self.balance_entry.config(state=tk.DISABLED)
 
 
@@ -96,11 +83,18 @@ class ViewAccount(tk.Toplevel):
 
     def changing_balance(self):
         self.balance_entry.config(state=tk.NORMAL)
-        confirm_balance_button = tk.Button(self, text="Confirm balance", command=self.change_balance)
-        confirm_balance_button.grid(column=2, row=3, padx=10, pady=10, columnspan=2)
+        self.confirm_balance_button.grid(column=2, row=3, padx=10, pady=10, columnspan=2)
 
     def change_balance(self):
-        print(self.balance_entry.get())
-
+        try:
+            new_balance = float(self.balance_entry.get())
+        except ValueError:
+            messagebox.showerror("Error", "Invalid balance value")
+            return False
+        self.db.update_bank_balance(self.selected_account[0], new_balance)
+        self.accounts = self.db.get_all_user_bank_accounts(self.user.get_people_id())
+        self.confirm_balance_button.grid_forget()
+        self.balance_entry.config(state=tk.DISABLED)
+        return True
 
 

@@ -52,7 +52,7 @@ class Database:
             self.execute_create_query(trigger)
             self.connection.commit()
 
-        views = ['CREATE VIEW View_Accounts AS SELECT a.People_ID, at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;',
+        views = ['CREATE VIEW View_Accounts AS SELECT a.Account_ID, a.People_ID, at.Account_Type, a.balance FROM Accounts a INNER JOIN Account_Type at ON a.Account_Type_ID = at.Account_Type_ID;',
                  'CREATE VIEW People_Info AS SELECT l.User_ID, p.People_ID, p.Forename, p.Surname, a.Address, a.Postcode, p.Phone_number, p.Email, b.Branch_Name, e.Employee_ID, r.Role_Name, e.Employee_Email FROM People p INNER JOIN Login l on p.People_ID = l.People_ID INNER JOIN Address a on a.Address_ID = p.Address_ID INNER JOIN Branch b on b.Branch_ID = p.Branch_ID LEFT JOIN Employees e on p.People_ID = e.People_ID LEFT JOIN Roles r on e.Role_ID = r.Role_ID;']
 
         for view in views:
@@ -319,3 +319,8 @@ class Database:
         result = self.cursor.execute(query, (user_id,)).fetchone()
         user = User(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8], (result[9] is not None), result[9], result[10], result[11])
         return user
+
+    def update_bank_balance(self, account_id, new_balance):
+        query = """UPDATE Accounts SET Balance = ? WHERE Account_ID = ?"""
+        self.cursor.execute(query, (new_balance, account_id))
+        self.connection.commit()
