@@ -23,7 +23,7 @@ class Database:
             'CREATE TABLE IF NOT EXISTS People ("People_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Forename" TEXT, "Surname" TEXT, "Address_ID" INTEGER REFERENCES Address("Address_ID"), "Phone_Number" INTEGER, "Email" TEXT, "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"));',
             'CREATE TABLE IF NOT EXISTS Employees ("Employee_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "People_ID" INTEGER REFERENCES People("People_ID"), "Role_ID" INTEGER REFERENCES Roles("Role_ID"), "Employee_Email" TEXT);',
             'CREATE TABLE IF NOT EXISTS Login ("User_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Username" TEXT, "Password" TEXT, "Encryption_Key" TEXT, "People_ID" INTEGER REFERENCES People("People_ID"), "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"));',
-            'CREATE TABLE IF NOT EXISTS Account_Type ( Account_Type_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Account_Type TEXT UNIQUE );'
+            'CREATE TABLE IF NOT EXISTS Account_Type ( Account_Type_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Account_Type TEXT UNIQUE );',
             'CREATE TABLE IF NOT EXISTS Accounts (Account_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, People_ID INTEGER REFERENCES People (People_ID), Account_Type_ID TEXT REFERENCES Account_type (Account_Type_ID), Balance REAL DEFAULT (0.0));',
             'CREATE TABLE IF NOT EXISTS Appointments ("Appointment_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"), "People_ID" INTEGER REFERENCES People("People_ID"), "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"), "Date" TEXT, "Time" INTEGER, "Purpose" TEXT);'
         ]
@@ -315,12 +315,22 @@ class Database:
         return True
 
     def generate_user_object(self, user_id):
+        """
+        Generates a user object from the database based on what valid login credentials were provided
+        :param user_id: The id of the logged in user
+        :return: A user object with all relevant data
+        """
         query = "SELECT * FROM People_Info WHERE User_ID = ?;"
         result = self.cursor.execute(query, (user_id,)).fetchone()
         user = User(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8], (result[9] is not None), result[9], result[10], result[11])
         return user
 
     def update_bank_balance(self, account_id, new_balance):
+        """
+        Updates the balance of a users bank account
+        :param account_id: id of the account to update
+        :param new_balance: new balance to update it to
+        """
         query = """UPDATE Accounts SET Balance = ? WHERE Account_ID = ?"""
         self.cursor.execute(query, (new_balance, account_id))
         self.connection.commit()

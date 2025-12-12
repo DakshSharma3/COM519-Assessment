@@ -34,7 +34,7 @@ class ViewAccount(tk.Toplevel):
                              fg="yellow",
                              listvariable=self.account_type,
                              selectmode="single")
-        self.available_account_listbox.bind('<<ListboxSelect>>', self.action)
+        self.available_account_listbox.bind('<<ListboxSelect>>', self.account_click)
 
         self.available_account_listbox.grid(column=0, row=1, padx=10, columnspan=2, rowspan=2)
         print(self.accounts[1])
@@ -55,7 +55,11 @@ class ViewAccount(tk.Toplevel):
 
         self.confirm_balance_button = tk.Button(self, text="Confirm balance", command=self.change_balance)
 
-    def action(self, event):
+    def account_click(self, event):
+        """
+        Display infomation about the bank account the user has clicked on
+        :param event:
+        """
         selection = self.available_account_listbox.curselection()[0]
         self.confirm_balance_button.grid_forget()
         self.selected_account = self.accounts[selection]
@@ -65,6 +69,7 @@ class ViewAccount(tk.Toplevel):
 
 
     def fill_selected_account_list(self):
+        """Fills in the information about the selected account"""
         self.account_type_entry.config(state=tk.NORMAL)
         self.balance_entry.config(state=tk.NORMAL)
         self.account_type_entry.delete(0, tk.END)
@@ -76,16 +81,25 @@ class ViewAccount(tk.Toplevel):
 
 
     def on_closing(self):
-        """Closes the application"""
+        """Returns the user to the main menu when closing the page"""
+        self.db.disconnect()
         self.parent.update()
         self.parent.deiconify()
         self.destroy()
 
     def changing_balance(self):
+        """
+        Unlocks the balance entry for the account to enter a new balance.
+        Also displays the confirm balance button
+        """
         self.balance_entry.config(state=tk.NORMAL)
         self.confirm_balance_button.grid(column=2, row=3, padx=10, pady=10, columnspan=2)
 
     def change_balance(self):
+        """
+        Updates the balance of the selected account in the database
+        :return: `True` if done successfully, `False` otherwise
+        """
         try:
             new_balance = float(self.balance_entry.get())
         except ValueError:

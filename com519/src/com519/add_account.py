@@ -1,9 +1,5 @@
 import tkinter as tk
-from functools import partial
 from tkinter import ttk, messagebox
-
-from cryptography.fernet import Fernet
-
 from database import Database
 
 
@@ -36,16 +32,14 @@ class AddAccount(tk.Toplevel):
         register_button.grid(column=0, row=2, padx=10, pady=10, columnspan=2)
 
     def on_closing(self):
-        """Closes the application"""
+        """Returns the user to the main menu when closing the page"""
+        self.db.disconnect()
         self.parent.update()
         self.parent.deiconify()
         self.destroy()
 
     def register_account(self):
-        """
-        Registers a bank account for the user
-        :return:
-        """
+        """ Registers a bank account for the user"""
         account_type = self.account_type.get()
         print(self.account_type.get())
 

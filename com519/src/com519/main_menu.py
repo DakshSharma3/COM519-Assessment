@@ -1,8 +1,6 @@
 import tkinter as tk
 from functools import partial
 from tkinter import ttk, messagebox
-from cryptography.fernet import Fernet
-
 from add_account import AddAccount
 from view_account import ViewAccount
 from database import Database
@@ -40,11 +38,16 @@ class MainMenu(tk.Toplevel):
     def on_closing(self):
         """Closes the application"""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.db.disconnect()
             exit()
 
-    def open_window(self, user_id, window):
-        """ Opens the add account window """
-        window = window(self, user_id)
+    def open_window(self, user, window):
+        """
+        Opens a new window
+        :param user: User object to use in the new window
+        :param window: The type of window to open
+        """
+        window = window(self, user)
         window.protocol("WM_DELETE_WINDOW", window.on_closing)
         window.grab_set()
         self.withdraw()

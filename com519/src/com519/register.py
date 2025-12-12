@@ -6,7 +6,6 @@ from cryptography.fernet import Fernet
 
 from database import Database
 
-
 class Register(tk.Toplevel):
     def __init__(self, parent, username_entry, password_entry):
         super().__init__(parent)
@@ -23,8 +22,6 @@ class Register(tk.Toplevel):
         email = tk.StringVar()
         branch = tk.StringVar()
         self.db = Database(self.database_name)
-
-
 
         username_text = tk.Label(self, text="Username: ", font=("Arial", 16))
         username_text.grid(column=0, row=0, padx=10, pady=10)
@@ -187,4 +184,5 @@ class Register(tk.Toplevel):
     def on_closing(self):
         """Closes the application"""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.db.disconnect()
             exit()
