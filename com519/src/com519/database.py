@@ -1,5 +1,4 @@
 import sqlite3
-
 from bank_user import User
 
 
@@ -161,7 +160,10 @@ class Database:
         """
         query = """SELECT Branch_ID FROM Branch WHERE Branch_Name = ?;"""
         results = self.cursor.execute(query, (branch,)).fetchone()
-        return results[0]
+        if results is None:
+            return None
+        else:
+            return results[0]
 
     def get_account_type_id(self, account_type):
         """
@@ -173,7 +175,10 @@ class Database:
         """
         query = """SELECT Account_Type_ID FROM Account_Type WHERE Account_Type = ?;"""
         results = self.cursor.execute(query, (account_type,)).fetchone()
-        return results[0]
+        if results is None:
+            return None
+        else:
+            return results[0]
 
     def get_user_id(self, username):
         """
@@ -185,7 +190,10 @@ class Database:
         """
         query = """SELECT User_ID FROM Login WHERE Username = ?;"""
         results = self.cursor.execute(query, (username,)).fetchone()
-        return results[0]
+        if results is None:
+            return None
+        else:
+            return results[0]
     
     def get_address_id(self, postcode):
         """
@@ -198,7 +206,10 @@ class Database:
         postcode = self.format_postcode(postcode)
         query = """SELECT Address_ID FROM Address WHERE Postcode = ?;"""
         results = self.cursor.execute(query, (postcode,)).fetchone()
-        return results[0]
+        if results is None:
+            return None
+        else:
+            return results[0]
     
     def address_exists(self, postcode):
         """
@@ -249,7 +260,10 @@ class Database:
         AND Phone_Number = ? AND Email = ? AND Branch_ID = ?;
         """
         results = self.cursor.execute(query, (first_name, surname, address_id, phone_number, email, branch_id)).fetchone()
-        return results[0]
+        if results is None:
+            return None
+        else:
+            return results[0]
 
     def get_people_id_from_user_id(self,user_id):
         """
@@ -259,24 +273,36 @@ class Database:
         """
         query = """SELECT People_ID FROM Login WHERE User_ID = ?;"""
         results = self.cursor.execute(query, (user_id,)).fetchone()
-        return results[0]
+        if results is None:
+            return None
+        else:
+            return results[0]
 
     def get_all_user_bank_accounts(self, people_id):
         query = """SELECT * FROM View_Accounts WHERE People_ID = ?;"""
         results = self.cursor.execute(query, (people_id,)).fetchall()
-        return results
+        if results is None:
+            return None
+        else:
+            return results
     
     def get_branch_names(self):
         """Gets all branch names avaliable from the database"""
         query = """SELECT Branch_Name FROM Branch;"""
         results = self.cursor.execute(query).fetchall()
-        return results
+        if results is None:
+            return None
+        else:
+            return results
 
     def get_account_type_names(self):
         """Gets all account type names avaliable from the database"""
         query = """SELECT Account_Type FROM Account_Type;"""
         results = self.cursor.execute(query).fetchall()
-        return results
+        if results is None:
+            return None
+        else:
+            return results
     
     def register_people(self,first_name, surname, phone_number, email, address, postcode, branch):
         """
