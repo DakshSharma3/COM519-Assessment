@@ -9,6 +9,7 @@ from database import Database
 class MainMenu(tk.Toplevel):
     def __init__(self, parent, user):
         super().__init__(parent)
+        self.parent = parent
         self.database_name = "COM519.db"
         self.title("Main Menu")
         self.geometry("300x300")
@@ -19,6 +20,11 @@ class MainMenu(tk.Toplevel):
             self.rowconfigure(i, weight=1)
         for i in range (0,2):
             self.columnconfigure(i, weight=1)
+
+        menu_bar = tk.Menu(self)
+        logout = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_command(label='Logout', command=self.logout)
+        self.config(menu=menu_bar)
 
         main_menu_text = tk.Label(self, text="Main Menu", font=("Arial", 16))
         main_menu_text.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
@@ -51,6 +57,13 @@ class MainMenu(tk.Toplevel):
         window.protocol("WM_DELETE_WINDOW", window.on_closing)
         window.grab_set()
         self.withdraw()
+
+    def logout(self):
+        """Logs the user out and returns them to the login page"""
+        self.db.disconnect()
+        self.parent.update()
+        self.parent.deiconify()
+        self.destroy()
 
 
 # main = MainMenu()
