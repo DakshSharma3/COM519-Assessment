@@ -19,6 +19,8 @@ class Main(tk.Tk):
         self.create_database()
         self.title("My Tkinter App")
         self.geometry("400x150")
+        img = tk.PhotoImage(file='garfield.png')
+        self.iconphoto(False, img)
         username = tk.StringVar()
         password = tk.StringVar()        
 
