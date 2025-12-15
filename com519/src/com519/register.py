@@ -173,13 +173,10 @@ class Register(tk.Toplevel):
                                                   postcode.get(), branch.get())
                 self.db.create_login_entry(username, password, key, people_id)
                 messagebox.showinfo("Information", "Registration Successful")
-                self.db.disconnect()
             else:
                 messagebox.showerror("Error", "Registration Failed, password does not meet requirements\n\n- 8 or more characters\n- Contains a capital letter\n- Contains a number\n- Contains a special character")
-                self.db.disconnect()
         else:
             messagebox.showerror("Error", "Registration Failed, username may already exist")
-            self.db.disconnect()
 
     def on_closing(self):
         """Closes the application"""
