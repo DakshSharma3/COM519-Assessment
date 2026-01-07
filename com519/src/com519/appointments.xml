@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Appointments>
+    <appointment id="1">
+        <employee_id>1</employee_id>
+        <people_id>1</people_id>
+        <branch_id>3</branch_id>
+        <date>11/11/2026</date>
+        <time>00:00</time>
+        <purpose>Re-evaluate investment portfolio</purpose>
+    </appointment>
+    <appointment id="2">
+        <employee_id>1</employee_id>
+        <people_id>1</people_id>
+        <branch_id>3</branch_id>
+        <date>11/11/2026</date>
+        <time>00:00</time>
+        <purpose>Re-evaluate investment portfolio</purpose>
+    </appointment>
+    <appointment id="1">
+        <employee_id>1</employee_id>
+        <people_id>1</people_id>
+        <branch_id>3</branch_id>
+        <date>11/11/2026</date>
+        <time>00:00</time>
+        <purpose>Re-evaluate investment portfolio</purpose>
+    </appointment>
+</Appointments>

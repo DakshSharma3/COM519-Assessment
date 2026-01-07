@@ -2,8 +2,12 @@ import tkinter as tk
 from functools import partial
 from tkinter import ttk, messagebox
 from add_account import AddAccount
+from com519.add_appointment import AddAppointment
+from  com519.update_profile_picture import UpdateProfilePicture
 from view_account import ViewAccount
 from database import Database
+import PIL
+
 
 
 class MainMenu(tk.Toplevel):
@@ -15,19 +19,24 @@ class MainMenu(tk.Toplevel):
         self.geometry("300x300")
         self.db = Database(self.database_name)
         self.user = user
-
+        img = tk.PhotoImage(file='garfield.png')
         for i in range (0,3):
             self.rowconfigure(i, weight=1)
         for i in range (0,2):
             self.columnconfigure(i, weight=1)
 
         menu_bar = tk.Menu(self)
-        logout = tk.Menu(menu_bar, tearoff=0)
+        # logout = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_command(label='Logout', command=self.logout)
+        menu_bar.add_command(label='Update profile picture', command= partial(self.open_window, self.user, UpdateProfilePicture))
         self.config(menu=menu_bar)
 
         main_menu_text = tk.Label(self, text="Main Menu", font=("Arial", 16))
-        main_menu_text.grid(column=0, row=0, padx=10, pady=10, columnspan=2)
+        main_menu_text.grid(column=0, row=0, padx=10, pady=10)
+
+        # garfield_text = tk.Label(self, text="Main Menu", font=("Arial", 16), image=img)
+        # garfield_text.image = img
+        # garfield_text.grid(column=1, row=0, padx=10, pady=10)
 
         add_account_button = tk.Button(self, text="Add Account", command= partial(self.open_window, self.user, AddAccount))
         add_account_button.grid(column=0, row=1, padx=10, pady=10)
@@ -35,7 +44,7 @@ class MainMenu(tk.Toplevel):
         view_account_button = tk.Button(self, text="View Account", command= partial(self.open_window, self.user, ViewAccount))
         view_account_button.grid(column=1, row=1, padx=10, pady=10)
 
-        add_appointment_button = tk.Button(self, text="Add Appointment")
+        add_appointment_button = tk.Button(self, text="Add Appointment", command= partial(self.open_window, self.user, AddAppointment))
         add_appointment_button.grid(column=0, row=2, padx=10, pady=10)
 
         view_appointment_button = tk.Button(self, text="View Appointment")
@@ -64,6 +73,8 @@ class MainMenu(tk.Toplevel):
         self.parent.update()
         self.parent.deiconify()
         self.destroy()
+
+
 
 
 # main = MainMenu()

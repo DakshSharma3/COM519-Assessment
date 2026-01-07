@@ -71,6 +71,8 @@ class Main(tk.Tk):
             if results[1] ==  username and cipher.decrypt(results[2]).decode() == password:
                 user_id = db.get_user_id(username)
                 self.open_menu_window(db.generate_user_object(user_id))
+            else:
+                messagebox.showerror("Error", "Invalid credentials")
         else:
             messagebox.showerror("Error", "Login Failed, no such user")
 

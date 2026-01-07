@@ -24,8 +24,9 @@ class Database:
             'CREATE TABLE IF NOT EXISTS Login ("User_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Username" TEXT, "Password" TEXT, "Encryption_Key" TEXT, "People_ID" INTEGER REFERENCES People("People_ID"), "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"));',
             'CREATE TABLE IF NOT EXISTS Account_Type ( Account_Type_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Account_Type TEXT UNIQUE );',
             'CREATE TABLE IF NOT EXISTS Accounts (Account_ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, People_ID INTEGER REFERENCES People (People_ID), Account_Type_ID TEXT REFERENCES Account_type (Account_Type_ID), Balance REAL DEFAULT (0.0));',
-            'CREATE TABLE IF NOT EXISTS Appointments ("Appointment_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"), "People_ID" INTEGER REFERENCES People("People_ID"), "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"), "Date" TEXT, "Time" INTEGER, "Purpose" TEXT);'
-        ]
+            'CREATE TABLE IF NOT EXISTS Appointments ("Appointment_ID" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, "Employee_ID" INTEGER REFERENCES Employees("Employee_ID"), "People_ID" INTEGER REFERENCES People("People_ID"), "Branch_ID" INTEGER REFERENCES Branch("Branch_ID"), "Date" TEXT, "Time" INTEGER, "Purpose" TEXT);',
+            'CREATE TABLE Profile_Picture (Profile_Picture_ID INTEGER PRIMARY KEY UNIQUE NOT NULL, People_ID INTEGER REFERENCES People (People_ID),Image BLOB);'
+            ]
     
         for query in table_queries:
             self.execute_create_query(query)
@@ -289,6 +290,25 @@ class Database:
     def get_branch_names(self):
         """Gets all branch names avaliable from the database"""
         query = """SELECT Branch_Name FROM Branch;"""
+        results = self.cursor.execute(query).fetchall()
+        if results is None:
+            return None
+        else:
+            return results
+
+    def get_all_customer_names(self):
+        """Gets all customer names avaliable from the database"""
+        query = """SELECT People_ID, Forename, Surname FROM People_Info;"""
+        results = self.cursor.execute(query).fetchall()
+        if results is None:
+            return None
+        else:
+            return results
+
+
+    def get_all_employee_names(self):
+        """Gets all customer names avaliable from the database"""
+        query = """SELECT Employee_ID, Forename, Surname FROM People_Info WHERE Employee_ID is not NULL;"""
         results = self.cursor.execute(query).fetchall()
         if results is None:
             return None
