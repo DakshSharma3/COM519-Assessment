@@ -11,12 +11,12 @@ class AddAppointment(tk.Toplevel):
     def __init__(self, parent, user):
         super().__init__(parent)
         self.parent = parent
-        self.database_name = "COM519.db"
+        self.database_name = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\COM519.db"
         self.title("Adding appointment")
         self.geometry("350x500")
         self.db = Database(self.database_name)
         self.user = user
-        self.appointments_file_name = "appointments.xml"
+        self.appointments_file_name = "C:\\Users\\e465565\\Desktop\\Git Repos\\COM519\\COM519-Assessment\\com519\\src\\com519\\appointments.xml"
         self.selected = tk.StringVar(value="")
         self.employee = tk.StringVar()
         self.customer = tk.StringVar()
@@ -94,13 +94,13 @@ class AddAppointment(tk.Toplevel):
                 self.employee_dropdown.set("")
 
     def add_appointment(self):
-       if self.validate_date_time():
-           if os.path.exists(self.appointments_file_name):
-               root = ET.Element("Appointments")
-               tree = ET.ElementTree(root)
-               tree.write(self.appointments_file_name)
-       else:
-           messagebox.showerror("Error", "Invalid Date Time\n-Date should be in DD/MM/YYYY format\n-Time should be in HH:MM format")
+        if self.validate_date_time():
+            if not os.path.exists(self.appointments_file_name):
+                self.create_appointment_xml(self.appointments_file_name)
+            self.add_to_xml(self.appointments_file_name)
+            messagebox.showinfo("Success", "Appointment successfully registered!")
+        else:
+            messagebox.showerror("Error", "Invalid Date Time\n-Date should be in DD/MM/YYYY format\n-Time should be in HH:MM format")
 
     def validate_date_time(self):
         try:
@@ -110,3 +110,33 @@ class AddAppointment(tk.Toplevel):
 
         except ValueError:
             return False
+
+    def create_appointment_xml(self, file_name):
+        root = ET.Element("Appointments")
+        tree = ET.ElementTree(root)
+        tree.write(file_name, encoding="utf-8", xml_declaration=True)
+
+    def add_to_xml(self, file_name):
+        
+        tree = ET.parse(file_name)
+        root = tree.getroot()
+
+        new_id = 0
+        for appt in root.findall("appointment"):
+            appt_id = int(appt.get("id", 0))
+            new_id = max(new_id, appt_id)
+
+        new_id += 1
+
+        doc = ET.SubElement(root, "appointment", id = str(new_id))
+
+        ET.SubElement(doc, "employee_id").text = self.employee.get().split(" ")[0]
+        ET.SubElement(doc, "people_id").text = self.customer.get().split(" ")[0]
+        ET.SubElement(doc, "branch_id").text = str(self.db.get_branch_id(self.branch.get()))
+        ET.SubElement(doc, "date").text = self.date.get()
+        ET.SubElement(doc, "time").text = self.time.get()
+        ET.SubElement(doc, "purpose").text = self.purpose.get()
+        ET.indent(root, space="    ", level=0)
+        tree = ET.ElementTree(root)
+
+        tree.write(file_name, encoding="utf-8", xml_declaration=True)
